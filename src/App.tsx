@@ -5,6 +5,8 @@ import Card from './components/Card'
 import Hero from './components/Hero'
 import Marquee from './components/Marquee'
 import ProductModal from './components/ProductModal'
+import BrandPicker from './components/BrandPicker'
+import Dropdown from './components/Dropdown'
 import CartPanel from './components/CartPanel'
 import { useReveal } from './useReveal'
 
@@ -28,6 +30,7 @@ export default function App() {
   const [limit, setLimit] = useState(48)
   const [open, setOpen] = useState<Product | null>(null)
   const [cartOpen, setCartOpen] = useState(false)
+  const [brandOpen, setBrandOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const catalogRef = useRef<HTMLDivElement>(null)
   const [cart, setCart] = useState<Record<number, number>>(() => {
@@ -43,8 +46,8 @@ export default function App() {
     return () => window.removeEventListener('scroll', on)
   }, [])
   useEffect(() => {
-    document.body.classList.toggle('locked', !!open || cartOpen)
-  }, [open, cartOpen])
+    document.body.classList.toggle('locked', !!open || cartOpen || brandOpen)
+  }, [open, cartOpen, brandOpen])
 
   const cats = useMemo(() => {
     const c = new Map<string, number>()
@@ -52,6 +55,11 @@ export default function App() {
     return ['Все', ...[...c.entries()].sort((a, b) => b[1] - a[1]).map(e => e[0])]
   }, [])
   const brands = useMemo(() => ['Все', ...Array.from(new Set(all.map(p => p.brand))).sort()], [])
+  const brandCounts = useMemo(() => {
+    const c: Record<string, number> = {}
+    all.forEach(p => { c[p.brand] = (c[p.brand] ?? 0) + 1 })
+    return c
+  }, [])
   // в ленту акций — по одному товару на бренд, сначала самая большая скидка
   const sales = useMemo(() => {
     const pct = (p: Product) => Number(p.sale?.match(/(\d+)%/)?.[1] ?? 0)
@@ -170,14 +178,15 @@ export default function App() {
             <div className="tools">
               <input className="search" placeholder="Поиск: название, бренд, штрихкод…"
                 value={q} onChange={e => setQ(e.target.value)} />
-              <select value={brand} onChange={e => setBrand(e.target.value)}>
-                {brands.map(b => <option key={b}>{b}</option>)}
-              </select>
-              <select value={sort} onChange={e => setSort(e.target.value as Sort)}>
-                <option value="name">По названию</option>
-                <option value="price-asc">Сначала дешёвые</option>
-                <option value="price-desc">Сначала дорогие</option>
-              </select>
+              <button className={brand === 'Все' ? 'dd-btn wide' : 'dd-btn wide on'}
+                onClick={() => setBrandOpen(true)}>
+                {brand === 'Все' ? 'Все бренды' : brand}<span className="dd-arrow" />
+              </button>
+              <Dropdown value={sort} onChange={v => setSort(v as Sort)} options={[
+                { value: 'name', label: 'По названию' },
+                { value: 'price-asc', label: 'Сначала дешёвые' },
+                { value: 'price-desc', label: 'Сначала дорогие' },
+              ]} />
               <label className="chk">
                 <input type="checkbox" checked={onlySale} onChange={e => setOnlySale(e.target.checked)} />
                 Только акции
@@ -233,8 +242,30 @@ export default function App() {
         </div>
       </footer>
 
-      {open && <ProductModal p={open} money={money} qty={cart[open.id] || 0}
-        setQty={n => setQty(open.id, n)} onClose={() => setOpen(null)} />}
+      {open && (
+        <ProductModal
+          p={open}
+          money={money}
+          kgs={kgs}
+          rate={rate}
+          qty={cart[open.id] || 0}
+          setQty={n => setQty(open.id, n)}
+          onClose={() => setOpen(null)}
+          onBrand={pickBrand}
+          onOpen={setOpen}
+          similar={all.filter(s => s.brand === open.brand && s.id !== open.id).slice(0, 6)}
+        />
+      )}
+
+      {brandOpen && (
+        <BrandPicker
+          brands={brands.slice(1)}
+          counts={brandCounts}
+          value={brand}
+          onPick={b => { setBrand(b); setBrandOpen(false); }}
+          onClose={() => setBrandOpen(false)}
+        />
+      )}
 
       {cartOpen && <CartPanel items={cartItems} total={total} money={money} wa={WA}
         setQty={setQty} onClose={() => setCartOpen(false)} clear={() => setCart({})} />}

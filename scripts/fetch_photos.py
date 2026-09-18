@@ -10,23 +10,25 @@
   python fetch_photos.py --only ANUA      # один бренд
   python fetch_photos.py                  # всё
 """
-import argparse, csv, io, json, re, time, unicodedata
+import argparse, csv, io, json, os, re, time, unicodedata
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urljoin, urlparse
 
 import requests
-from PIL import Image, ImageDraw, ImageFont, ImageStat
+from PIL import Image, ImageDraw, ImageFont, ImageStat, ImageFilter
 from ddgs import DDGS
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = Path.home() / "Desktop/Каталог KORSHOP/Фото"
+OUT = Path(os.environ.get("KORSHOP_OUT", Path.home() / "Desktop/Каталог KORSHOP/Фото"))
 DATA = json.loads((ROOT / "src/data/products.json").read_text(encoding="utf-8"))
 
 UA = {"User-Agent": ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
                      "(KHTML, like Gecko) Chrome/124.0 Safari/537.36")}
 WANT = 4
-MIN_SIDE = 640
+MIN_SIDE = 1000        # ниже этого кадр в набор не берём
+MIN_SIDE_SOFT = 820   # порог, если крупнее ничего не нашлось
+CAND_MAX = 10         # сколько кандидатов качаем, прежде чем выбрать лучшие
 BAD_URL = ("logo", "icon", "favicon", "sprite", "placeholder", "banner", "payment",
            "instagram", "facebook", "whatsapp", "telegram", "flag", "badge", "loader",
            "avatar", "thumb-", "/cart", "shipping")
@@ -62,11 +64,16 @@ def close(a: int, b: int) -> bool:
     return bin(a ^ b).count("1") <= 6
 
 def full_size(url: str) -> str:
-    """WooCommerce/Shopify режут картинку суффиксом — возвращаем оригинал."""
+    """CDN магазинов отдают превью — просим оригинал в максимальном размере."""
     url = re.sub(r"-\d{2,4}x\d{2,4}(?=\.(jpg|jpeg|png|webp))", "", url, flags=re.I)
     url = re.sub(r"_(\d{2,4}x\d{0,4}|small|medium|large|compact|grande)(?=\.(jpg|jpeg|png|webp))",
                  "", url, flags=re.I)
-    return re.sub(r"\?.*$", "", url)
+    url = re.sub(r"\?.*$", "", url)
+    if "/cdn/shop/" in url or "cdn.shopify" in url:      # Shopify отдаёт до 2048
+        url += "?width=2048"
+    elif "/wp-content/uploads/" in url:
+        url = re.sub(r"-scaled(?=\.)", "", url)
+    return url
 
 # ── сеть ──────────────────────────────────────────────────────────────────
 def ddg_text(q: str, n: int = 8) -> list[dict]:
@@ -125,13 +132,19 @@ def page_images(url: str, want: set[str], strict: bool) -> list[str]:
     return out
 
 
-def fetch(url: str) -> Image.Image | None:
+def sharpness(im: Image.Image) -> float:
+    g = im.convert("L")
+    g.thumbnail((400, 400), Image.LANCZOS)
+    return ImageStat.Stat(g.filter(ImageFilter.FIND_EDGES)).stddev[0]
+
+
+def fetch(url: str, floor: int) -> Image.Image | None:
     try:
         r = requests.get(url, headers=UA, timeout=25)
         r.raise_for_status()
         im = Image.open(io.BytesIO(r.content))
         im.load()
-        if min(im.size) < MIN_SIDE:
+        if min(im.size) < floor:
             return None
         w, h = im.size
         if not 0.6 < w / h < 1.7:         # баннеры и длинные простыни отсекаем
@@ -162,15 +175,19 @@ def wrap(draw, text, font, width, max_lines=3):
     return lines[:max_lines]
 
 def caption(im: Image.Image, p: dict) -> Image.Image:
-    S, PAD = 1000, 56
-    f_brand = ImageFont.truetype(FONT_B, 27)
-    f_name = ImageFont.truetype(FONT_B, 40)
-    f_small = ImageFont.truetype(FONT_R, 25)
+    """Кадр в исходном разрешении (до 2000 px) + подпись под ним."""
+    S = max(1200, min(2000, max(im.size)))
+    k = S / 1000                                   # всё масштабируем от базовой сетки
+    PAD = int(56 * k)
+    f_brand = ImageFont.truetype(FONT_B, int(27 * k))
+    f_name = ImageFont.truetype(FONT_B, int(40 * k))
+    f_small = ImageFont.truetype(FONT_R, int(25 * k))
 
     probe = ImageDraw.Draw(Image.new("RGB", (10, 10)))
     text = f'{p["name"]}{" · " + p["spec"] if p.get("spec") else ""}'
     lines = wrap(probe, text, f_name, S - 2 * PAD)
-    block = 30 + 40 + len(lines) * 50 + 46          # линия + бренд + строки + низ
+    step = int(50 * k)
+    block = int(30 * k) + int(40 * k) + len(lines) * step + int(46 * k)
 
     canvas = Image.new("RGB", (S, S + block), "white")
     photo = im.copy()
@@ -179,14 +196,20 @@ def caption(im: Image.Image, p: dict) -> Image.Image:
 
     d = ImageDraw.Draw(canvas)
     y = S
-    d.line([(PAD, y), (S - PAD, y)], fill="#e6e0d8", width=2)
-    y += 26
-    d.text((PAD, y), p["brand"], font=f_brand, fill="#c0563c"); y += 40
+    d.line([(PAD, y), (S - PAD, y)], fill="#e6e0d8", width=max(2, int(2 * k)))
+    y += int(26 * k)
+    d.text((PAD, y), p["brand"], font=f_brand, fill="#c0563c"); y += int(40 * k)
     for ln in lines:
-        d.text((PAD, y), ln, font=f_name, fill="#16130f"); y += 50
+        d.text((PAD, y), ln, font=f_name, fill="#16130f"); y += step
     tail = " · ".join(filter(None, [p.get("barcode"), p.get("pack"), f'${p["price"]:.2f}']))
-    d.text((PAD, y + 4), tail, font=f_small, fill="#857d73")
+    d.text((PAD, y + int(4 * k)), tail, font=f_small, fill="#857d73")
     return canvas
+
+
+def save(im: Image.Image, path: Path) -> None:
+    """JPEG без цветовой субдискретизации — на упаковках не мылятся буквы."""
+    im.save(path, quality=95, subsampling=0, optimize=True, progressive=True)
+
 
 # ── один товар ────────────────────────────────────────────────────────────
 def candidates(p: dict) -> list[str]:
@@ -221,46 +244,76 @@ def candidates(p: dict) -> list[str]:
     return urls
 
 
+def collect(p: dict, floor: int) -> list[tuple[float, Image.Image, str]]:
+    """Качаем кандидатов параллельно и оцениваем: крупнее и резче — выше."""
+    urls = candidates(p)[:CAND_MAX]
+    if not urls:
+        return []
+    got, hashes = [], []
+    with ThreadPoolExecutor(max_workers=6) as ex:
+        for url, im in zip(urls, ex.map(lambda u: fetch(u, floor), urls)):
+            if im is None:
+                continue
+            sharp = sharpness(im)
+            if sharp < 6:                      # мыло или грубый апскейл
+                continue
+            h = dhash(im)
+            if any(close(h, old) for old in hashes):
+                continue
+            hashes.append(h)
+            got.append((min(im.size) * min(sharp, 30), im, url))
+    return sorted(got, key=lambda t: -t[0])
+
+
 def handle(p: dict) -> dict:
     folder = OUT / slug(p["brand"], 40) / f'{p["id"]:04d}_{slug(p["name"])}'
     raw_dir = folder / "без подписи"
     if len(list(folder.glob("*.jpg"))) >= 3:
         return {"id": p["id"], "name": p["full"], "found": WANT, "status": "уже есть", "sources": ""}
 
-    saved, sources, hashes = 0, [], []
+    best = collect(p, MIN_SIDE)
+    if len(best) < 2:                       # крупного мало — снижаем планку
+        best = collect(p, MIN_SIDE_SOFT)
+
     folder.mkdir(parents=True, exist_ok=True)
     raw_dir.mkdir(exist_ok=True)
+    for old in folder.glob("*.jpg"):
+        old.unlink()
+    for old in raw_dir.glob("*.jpg"):
+        old.unlink()
 
-    # фото из прайса — эталон, ставим первым кадром
-    price_img = ROOT / "public/img" / (p.get("img") or "")
-    if p.get("img") and price_img.exists():
-        im = Image.open(price_img).convert("RGB")
-        hashes.append(dhash(im))
-        saved = 1
-        base = f'{p["id"]:04d}_{slug(p["name"], 60)}_1'
-        im.save(raw_dir / f"{base}.jpg", quality=92)
-        caption(im, p).save(folder / f"{base}.jpg", quality=92)
-        sources.append("фото из прайса")
-
-    for url in candidates(p):
-        im = fetch(url)
-        if im is None:
-            continue
-        h = dhash(im)
-        if any(close(h, old) for old in hashes):      # дубль того же фото
-            continue
-        hashes.append(h)
+    saved, sources, sizes = 0, [], []
+    for _, im, url in best[:WANT]:
         saved += 1
         base = f'{p["id"]:04d}_{slug(p["name"], 60)}_{saved}'
-        im.save(raw_dir / f"{base}.jpg", quality=92)
-        caption(im, p).save(folder / f"{base}.jpg", quality=92)
+        save(im, raw_dir / f"{base}.jpg")
+        save(caption(im, p), folder / f"{base}.jpg")
         sources.append(url)
-        if saved >= WANT:
-            break
+        sizes.append(f"{im.width}x{im.height}")
 
-    status = "ок" if saved >= 3 else ("мало" if saved else "не найдено")
+    # картинка из прайса — всего ~150 px, поэтому только когда сеть ничего не дала
+    if saved == 0 and p.get("img"):
+        src = ROOT / "public/img" / p["img"]
+        if src.exists():
+            im = Image.open(src).convert("RGB")
+            saved += 1
+            base = f'{p["id"]:04d}_{slug(p["name"], 60)}_{saved}'
+            save(im, raw_dir / f"{base}.jpg")
+            save(caption(im, p), folder / f"{base}.jpg")
+            sources.append("фото из прайса")
+            sizes.append(f"{im.width}x{im.height}")
+
+    if saved >= 3:
+        status = "ок"
+    elif saved and sources[0] == "фото из прайса":
+        status = "только прайс"
+    elif saved:
+        status = "мало"
+    else:
+        status = "не найдено"
     return {"id": p["id"], "name": p["full"], "found": saved, "status": status,
-            "sources": " | ".join(sources)}
+            "sources": " | ".join(f"{u} [{z}]" for u, z in zip(sources, sizes))}
+
 
 # ── прогон ────────────────────────────────────────────────────────────────
 def main():
