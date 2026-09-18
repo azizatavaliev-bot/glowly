@@ -281,6 +281,15 @@ footer { margin-top: 70px; background: var(--dark); color: rgba(255,255,255,.6);
 .m-left { min-width: 0; background: #f7f3ef; padding: 26px; display: flex; flex-direction: column; gap: 18px; }
 .m-pic { position: relative; background: #fff; border-radius: 18px; padding: 22px; display: grid; place-items: center; }
 .m-pic img { width: 100%; object-fit: contain; mix-blend-mode: multiply; }
+.nav { position: absolute; right: 62px; top: 14px; display: flex; gap: 6px; z-index: 5; }
+.nav button {
+  width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line);
+  background: rgba(255,255,255,.92); backdrop-filter: blur(4px);
+  font-size: 19px; line-height: 1; color: var(--ink); transition: .2s;
+}
+.nav button:hover:not(:disabled) { background: var(--ink); color: #fff; border-color: var(--ink); }
+.nav button:disabled { opacity: .35; cursor: default; }
+
 .thumbs { display: flex; gap: 8px; }
 .thumbs button {
   flex: 1; border: 1px solid var(--line); background: #fff; border-radius: 11px; padding: 6px;
@@ -486,6 +495,7 @@ footer { margin-top: 70px; background: var(--dark); color: rgba(255,255,255,.6);
   .price.big { font-size: 28px; }
   .acts { grid-template-columns: 1fr; }
   .calc-grid { grid-template-columns: 1fr; }
+  .nav { display: none; }
   .picker { padding: 18px; border-radius: 18px; max-height: 88vh; }
   .picker-grid { grid-template-columns: 1fr 1fr; }
   .dd, .dd-btn.wide { flex: 1 1 100%; min-width: 0; }

@@ -269,6 +269,8 @@ export default function App() {
           onBrand={pickBrand}
           onOpen={setOpen}
           similar={all.filter(s => s.brand === open.brand && s.id !== open.id).slice(0, 6)}
+          prev={list[list.findIndex(x => x.id === open.id) - 1] ?? null}
+          next={list[list.findIndex(x => x.id === open.id) + 1] ?? null}
         />
       )}
 

@@ -14,12 +14,14 @@ type Props = {
   onBrand: (b: string) => void
   similar: Product[]
   onOpen: (p: Product) => void
+  prev: Product | null
+  next: Product | null
 }
 
 const WA = '996559050618'
 
 export default function ProductModal({
-  p, qty, money: fmt, setQty, onClose, onBrand, similar, onOpen,
+  p, qty, money: fmt, setQty, onClose, onBrand, similar, onOpen, prev, next,
 }: Props) {
   const v = volume(p)
   const m = money(p)
@@ -33,10 +35,14 @@ export default function ProductModal({
   useEffect(() => { setShot(0); setCopied(false) }, [p.id])
 
   useEffect(() => {
-    const esc = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
-    document.addEventListener('keydown', esc)
-    return () => document.removeEventListener('keydown', esc)
-  }, [onClose])
+    const key = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+      if (e.key === 'ArrowLeft' && prev) onOpen(prev)
+      if (e.key === 'ArrowRight' && next) onOpen(next)
+    }
+    document.addEventListener('keydown', key)
+    return () => document.removeEventListener('keydown', key)
+  }, [onClose, onOpen, prev, next])
 
   const share = () => {
     const url = `${location.origin}${location.pathname}?p=${p.id}`
@@ -54,6 +60,10 @@ export default function ProductModal({
     <div className="overlay" onClick={onClose}>
       <div className="modal" onClick={e => e.stopPropagation()}>
         <button className="x" onClick={onClose} aria-label="Закрыть">×</button>
+        <div className="nav">
+          <button disabled={!prev} onClick={() => prev && onOpen(prev)} aria-label="Предыдущий товар">‹</button>
+          <button disabled={!next} onClick={() => next && onOpen(next)} aria-label="Следующий товар">›</button>
+        </div>
 
         <div className="m-left">
           <div className="m-pic">
