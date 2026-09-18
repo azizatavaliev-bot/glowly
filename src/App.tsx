@@ -62,12 +62,14 @@ export default function App() {
       .filter(p => !seen.has(p.brand) && seen.add(p.brand))
       .slice(0, 12)
   }, [])
-  const shots = useMemo(
-    () => ['ANUA', 'ROUND LAB', 'MEDICUBE', 'SKIN1004', 'DASIQUE']
-      .map(b => all.find(p => p.brand === b && p.img))
-      .filter((p): p is Product => !!p),
-    [],
-  )
+  // три ленты фото в шапке: по одному товару на бренд, чтобы витрина выглядела разной
+  const columns = useMemo(() => {
+    const seen = new Set<string>()
+    const pool = all.filter(p => p.img && !seen.has(p.brand) && seen.add(p.brand))
+    const cols: Product[][] = [[], [], []]
+    pool.slice(0, 27).forEach((p, i) => cols[i % 3].push(p))
+    return cols
+  }, [])
 
   const list = useMemo(() => {
     const words = q.trim().toLowerCase().split(/\s+/).filter(Boolean)
@@ -132,7 +134,7 @@ export default function App() {
       </header>
 
       <Hero total={all.length} brands={brands.length - 1} date={meta.date}
-        shots={shots} onStart={toCatalog} />
+        columns={columns} onStart={toCatalog} />
 
       <Marquee items={brands.slice(1)} onPick={pickBrand} />
 
