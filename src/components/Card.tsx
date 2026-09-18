@@ -3,19 +3,21 @@ import type { Product } from '../types'
 type Props = {
   p: Product
   qty: number
+  delay: number
   money: (usd: number) => string
   setQty: (n: number) => void
   onOpen: () => void
 }
 
-export default function Card({ p, qty, money, setQty, onOpen }: Props) {
+export default function Card({ p, qty, delay, money, setQty, onOpen }: Props) {
   return (
-    <article className="card">
+    <article className="card" data-reveal style={{ transitionDelay: `${delay * 28}ms` }}>
       <div className="pic" onClick={onOpen}>
         {p.img
           ? <img src={`/img/${p.img}`} alt={p.name} loading="lazy" />
           : <div className="noimg">нет фото</div>}
         {p.sale && <span className="badge">{p.sale.replace('АКЦИЯ ', '−').replace(/ [KS]$/, '')}</span>}
+        <span className="peek">подробнее</span>
       </div>
       <div className="body">
         <div className="brand">{p.brand}</div>
