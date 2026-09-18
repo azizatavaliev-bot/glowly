@@ -96,15 +96,11 @@ export function howTo(p: Product): string {
 }
 
 /** Деньги: короб, цена за мл, ориентир розницы. */
-export function money(p: Product, markup = 1.8) {
+export function money(p: Product) {
   const v = volume(p)
-  const box = p.packQty ? p.price * p.packQty : null
-  const perMl = v.ml ? p.price / v.ml : null
   return {
-    box,
+    box: p.packQty ? p.price * p.packQty : null,
     boxQty: p.packQty,
-    perMl,
-    retail: p.price * markup,
-    marginPerItem: p.price * markup - p.price,
+    perMl: v.ml ? p.price / v.ml : null,
   }
 }

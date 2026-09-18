@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import type { Product } from '../types'
 import { what, tags, howTo, volume, money } from '../describe'
 
@@ -20,9 +20,8 @@ const WA = '996559050618'
 export default function ProductModal({
   p, qty, money: fmt, setQty, onClose, onBrand, similar, onOpen,
 }: Props) {
-  const [markup, setMarkup] = useState(80)
   const v = volume(p)
-  const m = money(p, 1 + markup / 100)
+  const m = money(p)
   const list = tags(p)
 
   useEffect(() => {
@@ -87,28 +86,19 @@ export default function ProductModal({
           )}
 
           <div className="calc">
-            <div className="calc-head">
-              <span>Считаем деньги</span>
-              <label>
-                наценка
-                <input type="range" min={20} max={200} step={5} value={markup}
-                  onChange={e => setMarkup(Number(e.target.value))} />
-                <b>{markup}%</b>
-              </label>
-            </div>
+            <div className="calc-head"><span>Цены</span></div>
             <div className="calc-grid">
               <div><span>Закуп за штуку</span><b>{fmt(p.price)}</b></div>
-              {m.box && <div><span>Короб {m.boxQty} шт</span><b>{fmt(m.box)}</b></div>}
-              <div><span>Розница ориентир</span><b className="acc">{fmt(m.retail)}</b></div>
-              <div><span>Прибыль со штуки</span><b className="acc">{fmt(m.marginPerItem)}</b></div>
-              {m.box && (
+              {m.box
+                ? <div><span>Короб {m.boxQty} шт</span><b>{fmt(m.box)}</b></div>
+                : <div><span>Упаковка</span><b>{p.pack ?? '—'}</b></div>}
+              {m.perMl && (
                 <div className="wide">
-                  <span>Прибыль с короба при {markup}%</span>
-                  <b className="acc">{fmt(m.marginPerItem * (m.boxQty ?? 1))}</b>
+                  <span>Цена за 1 {v.text.includes('г') ? 'г' : 'мл'}</span>
+                  <b>{fmt(m.perMl)}</b>
                 </div>
               )}
             </div>
-            <div className="calc-note">Розница — ваш ориентир, не рекомендация бренда. Двигайте ползунок под свой рынок.</div>
           </div>
 
           <div className="m-actions">
