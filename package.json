@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite --port 5280",
     "build": "tsc -b && vite build",
+    "build:pages": "GH_PAGES=1 npm run build",
+    "photos": "python3 scripts/import_photos.py",
     "preview": "vite preview --port 5280",
     "parse": "python3 scripts/parse_price.py"
   },

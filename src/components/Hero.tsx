@@ -1,4 +1,5 @@
 import type { Product } from '../types'
+import { cover } from '../photo'
 
 type Props = {
   total: number
@@ -43,7 +44,7 @@ export default function Hero({ total, brands, date, columns, onStart }: Props) {
               <div className="lane-track">
                 {[...col, ...col].map((p, j) => (
                   <figure className="tile" key={`${p.id}-${j}`}>
-                    <img src={`/img/${p.img}`} alt="" loading={j < 3 ? 'eager' : 'lazy'} />
+                    <img src={cover(p) ?? ''} alt="" loading={j < 3 ? 'eager' : 'lazy'} />
                     <figcaption>
                       <b>{p.brand}</b>
                       <u>${p.price.toFixed(2)}</u>

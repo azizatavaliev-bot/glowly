@@ -1,4 +1,5 @@
 import type { Product } from '../types'
+import { cover, photos } from '../photo'
 
 type Props = {
   p: Product
@@ -10,12 +11,16 @@ type Props = {
 }
 
 export default function Card({ p, qty, delay, money, setQty, onOpen }: Props) {
+  const pic = cover(p)
+  const shots = photos(p).length
+
   return (
     <article className="card" data-reveal style={{ transitionDelay: `${delay * 28}ms` }}>
       <div className="pic" onClick={onOpen}>
-        {p.img
-          ? <img src={`/img/${p.img}`} alt={p.name} loading="lazy" />
+        {pic
+          ? <img src={pic} alt={p.name} loading="lazy" />
           : <div className="noimg">нет фото</div>}
+        {shots > 1 && <span className="shots">{shots} фото</span>}
         {p.sale && <span className="badge">{p.sale.replace('АКЦИЯ ', '−').replace(/ [KS]$/, '')}</span>}
         <span className="peek">подробнее</span>
       </div>

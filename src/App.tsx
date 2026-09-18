@@ -9,6 +9,7 @@ import BrandPicker from './components/BrandPicker'
 import Dropdown from './components/Dropdown'
 import CartPanel from './components/CartPanel'
 import { useReveal } from './useReveal'
+import { cover } from './photo'
 
 const meta = data.meta as Meta
 const all = data.products as Product[]
@@ -39,6 +40,20 @@ export default function App() {
 
   useEffect(() => { localStorage.setItem(CART_KEY, JSON.stringify(cart)) }, [cart])
   useEffect(() => { localStorage.setItem(RATE_KEY, String(rate)) }, [rate])
+  // ссылка вида ?p=123 открывает карточку товара сразу
+  useEffect(() => {
+    const id = Number(new URLSearchParams(location.search).get('p'))
+    const found = id ? all.find(p => p.id === id) : null
+    if (found) setOpen(found)
+  }, [])
+
+  useEffect(() => {
+    const url = new URL(location.href)
+    if (open) url.searchParams.set('p', String(open.id))
+    else url.searchParams.delete('p')
+    history.replaceState(null, '', url)
+  }, [open])
+
   useEffect(() => {
     const on = () => setScrolled(window.scrollY > 40)
     on()
@@ -157,7 +172,7 @@ export default function App() {
           <div className="rail">
             {sales.map(p => (
               <button className="sale-card" key={p.id} onClick={() => setOpen(p)}>
-                <img src={`/img/${p.img}`} alt={p.name} loading="lazy" />
+                <img src={cover(p) ?? ''} alt={p.name} loading="lazy" />
                 <span className="badge">{p.sale!.replace('АКЦИЯ ', '−').replace(/ [KS]$/, '')}</span>
                 <b>{p.brand}</b>
                 <i>{p.name}</i>

@@ -1,6 +1,7 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import type { Product } from '../types'
 import { summary, volume, money, benefits, forWhom, steps, tags } from '../describe'
+import { photos } from '../photo'
 
 type Props = {
   p: Product
@@ -26,12 +27,23 @@ export default function ProductModal({
   const who = forWhom(p)
   const how = steps(p)
   const acts = tags(p)
+  const shots = photos(p)
+  const [shot, setShot] = useState(0)
+  const [copied, setCopied] = useState(false)
+  useEffect(() => { setShot(0); setCopied(false) }, [p.id])
 
   useEffect(() => {
     const esc = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
     document.addEventListener('keydown', esc)
     return () => document.removeEventListener('keydown', esc)
   }, [onClose])
+
+  const share = () => {
+    const url = `${location.origin}${location.pathname}?p=${p.id}`
+    navigator.clipboard.writeText(url)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   const ask = () => {
     const text = `Здравствуйте! Интересует: ${p.full}${p.spec ? ` [${p.spec}]` : ''}, штрихкод ${p.barcode ?? '—'}. Цена $${p.price.toFixed(2)}. Есть в наличии?`
@@ -45,9 +57,20 @@ export default function ProductModal({
 
         <div className="m-left">
           <div className="m-pic">
-            {p.img ? <img src={`/img/${p.img}`} alt={p.name} /> : <div className="noimg">нет фото</div>}
+            {shots.length
+              ? <img src={shots[shot]} alt={p.name} key={shots[shot]} />
+              : <div className="noimg">нет фото</div>}
             {p.sale && <span className="badge">{p.sale.replace('АКЦИЯ ', '−').replace(/ [KS]$/, '')}</span>}
           </div>
+          {shots.length > 1 && (
+            <div className="thumbs">
+              {shots.map((src, i) => (
+                <button key={src} className={i === shot ? 'on' : ''} onClick={() => setShot(i)}>
+                  <img src={src} alt="" />
+                </button>
+              ))}
+            </div>
+          )}
           <div className="m-facts">
             {v.text !== '—' && <div><span>Объём</span><b>{v.text}</b></div>}
             {p.pack && <div><span>Упаковка</span><b>{p.pack}</b></div>}
@@ -142,6 +165,9 @@ export default function ProductModal({
             )}
             <div className="m-sub">
               <button className="ghost-sm" onClick={ask}>Спросить в WhatsApp</button>
+              <button className="ghost-sm" onClick={share}>
+                {copied ? 'Ссылка скопирована' : 'Ссылка на товар'}
+              </button>
               {p.barcode && (
                 <button className="ghost-sm" onClick={() => navigator.clipboard.writeText(p.barcode!)}>
                   Копировать штрихкод
@@ -157,7 +183,7 @@ export default function ProductModal({
               <div className="similar-row">
                 {similar.map(s => (
                   <button key={s.id} onClick={() => onOpen(s)}>
-                    {s.img && <img src={`/img/${s.img}`} alt="" />}
+                    {photos(s)[0] && <img src={photos(s)[0]} alt="" />}
                     <i>{s.name}</i>
                     <u>{fmt(s.price)}</u>
                   </button>

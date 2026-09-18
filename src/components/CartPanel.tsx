@@ -1,4 +1,5 @@
 import type { Product } from '../types'
+import { cover } from '../photo'
 
 type Item = { p: Product; qty: number }
 type Props = {
@@ -43,7 +44,7 @@ export default function CartPanel({ items, total, wa, money, setQty, onClose, cl
         <div className="cart-list">
           {items.map(({ p, qty }) => (
             <div className="ci" key={p.id}>
-              {p.img ? <img src={`/img/${p.img}`} alt="" /> : <div className="noimg sm" />}
+              {cover(p) ? <img src={cover(p)!} alt="" /> : <div className="noimg sm" />}
               <div className="ci-b">
                 <div className="ci-n">{p.name}{p.spec ? ` · ${p.spec}` : ''}</div>
                 <div className="ci-p">{money(p.price)} × {qty} = <b>{money(p.price * qty)}</b></div>

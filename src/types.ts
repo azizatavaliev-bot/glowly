@@ -10,6 +10,7 @@ export type Product = {
   packQty: number | null
   price: number
   img: string | null
+  photos?: string[]
   cat: string
   sale: string | null
   exp: string | null
