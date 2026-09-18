@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import type { Product } from '../types'
-import { what, howTo, volume, money, benefits } from '../describe'
+import { summary, volume, money, benefits, forWhom, steps, tags } from '../describe'
 
 type Props = {
   p: Product
@@ -23,6 +23,9 @@ export default function ProductModal({
   const v = volume(p)
   const m = money(p)
   const good = benefits(p)
+  const who = forWhom(p)
+  const how = steps(p)
+  const acts = tags(p)
 
   useEffect(() => {
     const esc = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
@@ -72,14 +75,42 @@ export default function ProductModal({
             {m.perMl && <span className="per">{fmt(m.perMl)} за 1 {v.text.includes('г') ? 'г' : 'мл'}</span>}
           </div>
 
-          <p className="what">{what(p)} {howTo(p)}</p>
+          <p className="what">{summary(p)}</p>
 
-          <div className="use">
-            <div className="use-head">Чем полезен</div>
-            <ul>
+          <section className="sec">
+            <div className="sec-h">Чем полезен</div>
+            <ul className="dots">
               {good.map(b => <li key={b}>{b}</li>)}
             </ul>
-          </div>
+          </section>
+
+          <section className="sec">
+            <div className="sec-h">Кому подойдёт</div>
+            <div className="chips">
+              {who.map(w => <span className="chip-sm" key={w}>{w}</span>)}
+            </div>
+          </section>
+
+          <section className="sec">
+            <div className="sec-h">Как применять</div>
+            <ol className="steps">
+              {how.map(st => <li key={st}>{st}</li>)}
+            </ol>
+          </section>
+
+          {!!acts.length && (
+            <section className="sec">
+              <div className="sec-h">Активные компоненты</div>
+              <div className="acts">
+                {acts.map(a => (
+                  <div className="act" key={a.label}>
+                    <b>{a.label}</b>
+                    <span>{a.text}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           <div className="calc">
             <div className="calc-head"><span>Цены</span></div>
