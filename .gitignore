@@ -1,0 +1,44 @@
+# --- секреты (ЖЕЛЕЗНО) ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets.json
+.secrets/
+
+# --- зависимости ---
+node_modules/
+.pnp
+.pnp.js
+venv/
+__pycache__/
+*.pyc
+
+# --- сборка ---
+dist/
+build/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+
+# --- база ---
+*.sqlite
+*.sqlite3
+*.db
+
+# --- система ---
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+.cache/
+coverage/
+
+# --- IDE ---
+.vscode/
+.idea/
+
+# --- локальные настройки Claude ---
+.claude/settings.local.json
