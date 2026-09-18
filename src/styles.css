@@ -296,6 +296,15 @@ footer { margin-top: 70px; background: var(--dark); color: rgba(255,255,255,.6);
 .per { color: var(--mut); font-size: 13px; background: #f4f1ec; padding: 5px 11px; border-radius: 8px; }
 .what { color: var(--mut); font-size: 14.5px; line-height: 1.6; margin: 14px 0 18px; }
 
+.use { border: 1px solid var(--line); background: #faf7f4; border-radius: 16px; padding: 16px 18px; margin-bottom: 18px; }
+.use-head { font-weight: 700; font-size: 14px; margin-bottom: 10px; }
+.use ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.use li { position: relative; padding-left: 20px; font-size: 13.5px; line-height: 1.5; color: #45403a; }
+.use li::before {
+  content: ''; position: absolute; left: 3px; top: 8px; width: 6px; height: 6px;
+  border-radius: 50%; background: var(--acc);
+}
+
 .tags { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
 .tag { background: #faf7f4; border: 1px solid var(--line); border-radius: 13px; padding: 11px 13px; }
 .tag b { display: block; font-size: 12.5px; margin-bottom: 3px; }

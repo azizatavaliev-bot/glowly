@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import type { Product } from '../types'
-import { what, tags, howTo, volume, money } from '../describe'
+import { what, howTo, volume, money, benefits } from '../describe'
 
 type Props = {
   p: Product
@@ -22,7 +22,7 @@ export default function ProductModal({
 }: Props) {
   const v = volume(p)
   const m = money(p)
-  const list = tags(p)
+  const good = benefits(p)
 
   useEffect(() => {
     const esc = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
@@ -74,16 +74,12 @@ export default function ProductModal({
 
           <p className="what">{what(p)} {howTo(p)}</p>
 
-          {!!list.length && (
-            <div className="tags">
-              {list.map(t => (
-                <div className="tag" key={t.label}>
-                  <b>{t.label}</b>
-                  <span>{t.text}</span>
-                </div>
-              ))}
-            </div>
-          )}
+          <div className="use">
+            <div className="use-head">Чем полезен</div>
+            <ul>
+              {good.map(b => <li key={b}>{b}</li>)}
+            </ul>
+          </div>
 
           <div className="calc">
             <div className="calc-head"><span>Цены</span></div>
