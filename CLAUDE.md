@@ -7,7 +7,17 @@ Vite 5 + React 18 + TypeScript, без бэкенда. Данные — стат
 
 ## Ссылки
 - local: http://localhost:5280
-- prod: пока нет
+- prod: https://azizatavaliev-bot.github.io/korshop-catalog/ (GitHub Pages, ветка gh-pages)
+
+## Деплой
+```bash
+npm run build:pages                 # сборка с base=/korshop-catalog/
+npx gh-pages -d dist -b gh-pages    # публикация
+```
+Railway-токен из Keychain мёртв (Unauthorized) — деплой идёт через GitHub Pages
+аккаунта azizatavaliev-bot. Репозиторий публичный: Pages на бесплатном плане
+приватные репо не обслуживает. Пути к файлам строятся от `import.meta.env.BASE_URL`
+(см. `src/photo.ts`) — иначе на Pages будут 404.
 
 ## Запуск
 ```bash
@@ -40,6 +50,12 @@ npm run parse    # пересобрать данные из прайса
 - `src/components/Marquee.tsx` — бегущая лента брендов, клик = фильтр по бренду
 - `src/useReveal.ts` — появление блоков по `data-reveal` через IntersectionObserver
 - Шрифты Manrope + Playfair Display подключены с Google Fonts (офлайн — откатятся на системные)
+
+## Фото товаров
+- В xlsx лежат превью 146 px — для сайта негодны.
+- `scripts/fetch_photos.py` ищет фото по штрихкоду, качает оригиналы (≥1000 px), подписывает названием и складывает в `~/Desktop/Каталог KORSHOP/Фото`.
+- `scripts/import_photos.py` переносит их в `public/photos` (webp 900 px) и пишет `photos[]` в products.json.
+- `scripts/verify_photos.py` сверяет каждое фото с превью из прайса по цветовой гистограмме: явный мусор удаляет, остальные сортирует — самое похожее становится обложкой. Часть фото всё же может оказаться другим товаром того же бренда, проверять глазами.
 
 ## Что умеет сайт
 Поиск по названию/бренду/штрихкоду, фильтр по категории и бренду, сортировка, «только акции», переключатель USD↔сом с редактируемым курсом (по умолчанию 87.5 — проверять перед показом клиенту), карточка товара, заявка: WhatsApp, копирование текста, выгрузка CSV.
