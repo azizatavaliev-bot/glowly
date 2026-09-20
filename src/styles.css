@@ -505,10 +505,17 @@ footer { margin-top: 70px; background: var(--dark); color: rgba(255,255,255,.6);
   .cats { flex-wrap: nowrap; overflow-x: auto; margin-inline: -16px; padding: 2px 16px 4px; }
   .cats::-webkit-scrollbar { display: none; }
   .chip { white-space: nowrap; }
+  /* панель фильтров на телефоне: две колонки вместо стопки */
   .tools { gap: 8px; }
-  .tools select { flex: 1 1 0; min-width: 0; padding: 12px 10px; font-size: 14px; }
-  .chk { flex: 1 1 100%; font-size: 13.5px; }
-  .search { flex: 1 1 100%; padding: 12px 15px; }
+  .search-box { flex: 1 1 100%; }
+  .search { padding: 12px 15px; }
+  .tools .dd, .tools .dd-btn.wide { flex: 1 1 calc(50% - 4px); min-width: 0; }
+  .dd-btn { padding: 11px 13px; font-size: 13.5px; }
+  .chk { flex: 0 0 auto; font-size: 13px; margin-left: auto; }
+  .hints { flex-wrap: nowrap; overflow-x: auto; margin-inline: -16px; padding: 8px 16px 2px; }
+  .hints::-webkit-scrollbar { display: none; }
+  .hints > span { flex: 0 0 auto; }
+  .hint { white-space: nowrap; }
   .row { flex-direction: column; align-items: stretch; gap: 8px; }
   .add { width: 100%; text-align: center; padding: 11px; }
   .qty { justify-content: space-between; }
@@ -590,4 +597,48 @@ a.cart-btn { text-decoration: none; }
   .clip img { width: 108px; }
   .clip .play { left: 48px; }
   .city { display: none; }
+}
+
+/* ── поиск, подсказки и полки «по задаче» ───────────────────────── */
+.search-box { position: relative; flex: 1 1 320px; display: flex; }
+.search-box .search { flex: 1; padding-right: 42px; }
+.clear {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  width: 26px; height: 26px; border: 0; border-radius: 50%; background: #f1ece6;
+  color: var(--mut); font-size: 17px; line-height: 1;
+}
+.clear:hover { background: var(--ink); color: #fff; }
+
+.hints { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-top: 10px; font-size: 12px; color: var(--mut); }
+.hint { border: 1px dashed var(--line); background: transparent; border-radius: 20px; padding: 5px 12px; font-size: 12.5px; color: var(--mut); transition: .2s var(--ease); }
+.hint:hover { border-style: solid; border-color: var(--ink); color: var(--ink); }
+.hint.on { background: var(--acc-soft); border-color: var(--acc); border-style: solid; color: var(--acc); font-weight: 600; }
+
+.needs { padding: 54px 0 6px; }
+.need-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+.need {
+  display: flex; align-items: center; gap: 11px; text-align: left;
+  background: #fff; border: 1px solid var(--line); border-radius: 15px; padding: 14px 16px;
+  transition: .22s var(--ease);
+}
+.need:hover { transform: translateY(-3px); border-color: var(--ink); box-shadow: 0 12px 26px rgba(22,19,15,.07); }
+.need span { font-size: 21px; line-height: 1; }
+.need b { flex: 1; font-size: 13.5px; font-weight: 600; }
+.need i { font-style: normal; font-size: 11.5px; color: var(--mut); }
+.need.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+.need.on i { color: rgba(255,255,255,.6); }
+
+.sub { font-size: 11.5px; color: var(--mut); line-height: 1.35; cursor: pointer; }
+.sub.big { font-size: 13px; margin-top: 2px; }
+
+@media (max-width: 720px) {
+  .needs { padding: 34px 0 4px; }
+  .need-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .need { padding: 12px; gap: 8px; border-radius: 13px; }
+  .need b { font-size: 12.5px; }
+  .need span { font-size: 18px; }
+  .hints { gap: 6px; margin-top: 8px; flex-wrap: nowrap; overflow-x: auto;
+    margin-inline: -16px; padding: 0 16px 2px; }
+  .hints::-webkit-scrollbar { display: none; }
+  .hints > span, .hint { flex: 0 0 auto; white-space: nowrap; }
 }

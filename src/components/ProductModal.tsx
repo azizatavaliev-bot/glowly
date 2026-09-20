@@ -3,6 +3,7 @@ import type { Product, Video } from '../types'
 import { summary, volume, benefits, forWhom, steps } from '../describe'
 import { photos } from '../photo'
 import { price, cityPrice, saving, som } from '../pricing'
+import { split, full } from '../name'
 import videos from '../data/videos.json'
 
 type Props = {
@@ -18,7 +19,7 @@ type Props = {
 const WA = '996559050618'
 
 export function orderLink(p: Product): string {
-  const text = `Здравствуйте! Хочу заказать:\n${p.name}${p.spec ? ` (${p.spec})` : ''}\n${p.brand} · ${som(price(p))}\n\nПодскажите, есть в наличии?`
+  const text = `Здравствуйте! Хочу заказать:\n${full(p)}${p.spec ? ` (${p.spec})` : ''}\n${p.brand} · ${som(price(p))}\n\nПодскажите, есть в наличии?`
   return `https://wa.me/${WA}?text=${encodeURIComponent(text)}`
 }
 
@@ -80,7 +81,8 @@ export default function ProductModal({ p, onClose, onBrand, similar, onOpen, pre
           <button className="brand link-brand" onClick={() => { onBrand(p.brand); onClose() }}>
             {p.brand} →
           </button>
-          <h2>{p.name}</h2>
+          <h2>{split(p).title}</h2>
+          {split(p).sub && <div className="sub big">{split(p).sub}</div>}
           {p.spec && <div className="spec big">{p.spec}</div>}
 
           <div className="m-price">
@@ -142,7 +144,7 @@ export default function ProductModal({ p, onClose, onBrand, similar, onOpen, pre
                 {similar.map(s => (
                   <button key={s.id} onClick={() => onOpen(s)}>
                     {photos(s)[0] && <img src={photos(s)[0]} alt="" />}
-                    <i>{s.name}</i>
+                    <i>{split(s).title}</i>
                     <u>{som(price(s))}</u>
                   </button>
                 ))}

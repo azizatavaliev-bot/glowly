@@ -10,6 +10,9 @@ import Dropdown from './components/Dropdown'
 import { useReveal } from './useReveal'
 import { cover } from './photo'
 import { price, som } from './pricing'
+import { split } from './name'
+import { matches, HINTS } from './search'
+import { NEEDS, hasNeed, countNeed } from './needs'
 
 const meta = data.meta as Meta
 const all = data.products as Product[]
@@ -25,6 +28,7 @@ export default function App() {
   const [brand, setBrand] = useState('Все')
   const [sort, setSort] = useState<Sort>('name')
   const [onlySale, setOnlySale] = useState(false)
+  const [need, setNeed] = useState('')
   const [limit, setLimit] = useState(48)
   const [open, setOpen] = useState<Product | null>(null)
   const [brandOpen, setBrandOpen] = useState(false)
@@ -89,22 +93,20 @@ export default function App() {
   }, [])
 
   const list = useMemo(() => {
-    const words = q.trim().toLowerCase().split(/\s+/).filter(Boolean)
     const r = all.filter(p => {
+      if (need && !hasNeed(p, need)) return false
       if (cat !== 'Все' && p.cat !== cat) return false
       if (brand !== 'Все' && p.brand !== brand) return false
       if (onlySale && !p.sale) return false
-      if (!words.length) return true
-      const hay = `${p.full} ${p.spec ?? ''}`.toLowerCase()
-      return words.every(w => hay.includes(w))
+      return matches(p, q)
     })
     return [...r].sort((a, b) =>
       sort === 'price-asc' ? a.price - b.price :
       sort === 'price-desc' ? b.price - a.price :
       a.name.localeCompare(b.name, 'ru'))
-  }, [q, cat, brand, sort, onlySale])
+  }, [q, cat, brand, sort, onlySale, need])
 
-  useEffect(() => { setLimit(48) }, [q, cat, brand, sort, onlySale])
+  useEffect(() => { setLimit(48) }, [q, cat, brand, sort, onlySale, need])
   useReveal([list, limit])
 
   const toCatalog = () => catalogRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -155,7 +157,7 @@ export default function App() {
                 <img src={cover(p) ?? ''} alt={p.name} loading="lazy" />
                 <span className="badge">{p.sale!.replace('АКЦИЯ ', '−').replace(/ [KS]$/, '')}</span>
                 <b>{p.brand}</b>
-                <i>{p.name}</i>
+                <i>{split(p).title}</i>
                 <u>{som(price(p))}</u>
               </button>
             ))}
@@ -163,16 +165,38 @@ export default function App() {
         </section>
       )}
 
+      <section className="needs" data-reveal>
+        <div className="wrap">
+          <h2 className="sec-title">Что вам нужно?</h2>
+          <div className="need-grid">
+            {NEEDS.map(n => (
+              <button key={n.key}
+                className={need === n.key ? 'need on' : 'need'}
+                onClick={() => { setNeed(need === n.key ? '' : n.key); toCatalog() }}>
+                <span>{n.emoji}</span>
+                <b>{n.label}</b>
+                <i>{countNeed(all, n.key)}</i>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <div className="catalog" ref={catalogRef} id="catalog">
         <div className="wrap">
-          <h2 className="sec-title" data-reveal>Каталог</h2>
+          <h2 className="sec-title" data-reveal>
+            {need ? NEEDS.find(n => n.key === need)?.label : 'Каталог'}
+          </h2>
         </div>
 
         <div className="sticky">
           <div className="wrap">
             <div className="tools">
-              <input className="search" placeholder="Что ищете? Крем, тонер, ANUA…"
-                value={q} onChange={e => setQ(e.target.value)} />
+              <div className="search-box">
+                <input className="search" placeholder="Что ищете? «крем от прыщей», «тонер», ANUA…"
+                  value={q} onChange={e => setQ(e.target.value)} />
+                {q && <button className="clear" onClick={() => setQ('')} aria-label="Очистить">×</button>}
+              </div>
               <button className={brand === 'Все' ? 'dd-btn wide' : 'dd-btn wide on'}
                 onClick={() => setBrandOpen(true)}>
                 {brand === 'Все' ? 'Все бренды' : brand}<span className="dd-arrow" />
@@ -187,6 +211,13 @@ export default function App() {
                 Только скидки
               </label>
             </div>
+            <div className="hints">
+              <span>Часто ищут:</span>
+              {HINTS.map(h => (
+                <button key={h} className={q === h ? 'hint on' : 'hint'}
+                  onClick={() => setQ(q === h ? '' : h)}>{h}</button>
+              ))}
+            </div>
             <div className="cats">
               {cats.map(c => (
                 <button key={c} className={c === cat ? 'chip on' : 'chip'} onClick={() => setCat(c)}>
@@ -200,8 +231,8 @@ export default function App() {
         <div className="wrap">
           <div className="found">
             Найдено: <b>{list.length}</b>
-            {(brand !== 'Все' || cat !== 'Все' || onlySale || q) && (
-              <button className="link" onClick={() => { setBrand('Все'); setCat('Все'); setOnlySale(false); setQ('') }}>
+            {(brand !== 'Все' || cat !== 'Все' || onlySale || q || need) && (
+              <button className="link" onClick={() => { setBrand('Все'); setCat('Все'); setOnlySale(false); setQ(''); setNeed('') }}>
                 сбросить фильтры
               </button>
             )}

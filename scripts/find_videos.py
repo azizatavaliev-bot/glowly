@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """
-Ищет видеообзор на YouTube для каждого товара и пишет src/data/videos.json.
+Ищет русскоязычный видеообзор на YouTube для каждого товара
+и пишет src/data/videos.json.
 
-Берём только ролики, в заголовке которых есть бренд — иначе в карточку
-попадёт случайное видео про уход вообще.
+Берём только ролики, где в заголовке есть бренд, слово из названия товара
+и кириллица — англоязычные обзоры покупателю из Бишкека не нужны.
 
   python scripts/find_videos.py --limit 10     # пилот
   python scripts/find_videos.py                # все товары
@@ -54,8 +55,15 @@ def search(query: str) -> list[dict]:
     walk(data)
     return out
 
+CYR = re.compile(r"[а-яё]", re.I)
+
+def is_russian(r: dict) -> bool:
+    """Русским считаем ролик, если кириллица есть в заголовке или в названии канала."""
+    title_cyr = len(CYR.findall(r["title"]))
+    return title_cyr >= 4 or (title_cyr >= 1 and len(CYR.findall(r.get("ch", ""))) >= 3)
+
 def pick(results: list[dict], brand: str, words: list[str]) -> list[dict]:
-    """Оставляем ролики, где заголовок говорит о нужном бренде."""
+    """Оставляем русские ролики, где заголовок говорит о нужном бренде."""
     brand_key = re.sub(r"[^a-zа-я0-9]", "", brand.lower())
     good, seen = [], set()
     for r in results:
@@ -68,6 +76,8 @@ def pick(results: list[dict], brand: str, words: list[str]) -> list[dict]:
         # шортсы без длительности пропускаем: у них часто нет обзора по существу
         if not r.get("len"):
             continue
+        if not is_russian(r):
+            continue
         hits = sum(1 for w in words if w in t)
         if not hits:                    # бренд совпал, а товар — нет: это не обзор нашей позиции
             continue
@@ -79,10 +89,9 @@ def pick(results: list[dict], brand: str, words: list[str]) -> list[dict]:
 def handle(p: dict) -> tuple[int, list[dict]]:
     latin = re.findall(r"[A-Za-z][A-Za-z0-9\-]{2,}", p["name"])[:5]
     words = [w.lower() for w in latin]
-    query = f'{p["brand"]} {" ".join(latin)} обзор'
-    vids = pick(search(query), p["brand"], words)
+    vids = pick(search(f'{p["brand"]} {" ".join(latin)} обзор'), p["brand"], words)
     if not vids:
-        vids = pick(search(f'{p["brand"]} {" ".join(latin)} review'), p["brand"], words)
+        vids = pick(search(f'{p["brand"]} {" ".join(latin[:3])} отзыв'), p["brand"], words)
     time.sleep(0.4)
     return p["id"], vids
 

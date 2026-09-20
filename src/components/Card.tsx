@@ -1,6 +1,7 @@
 import type { Product } from '../types'
 import { cover, photos } from '../photo'
 import { price, cityPrice, saving, som } from '../pricing'
+import { split } from '../name'
 import { orderLink } from './ProductModal'
 
 type Props = {
@@ -13,6 +14,7 @@ export default function Card({ p, delay, onOpen }: Props) {
   const pic = cover(p)
   const shots = photos(p).length
   const save = saving(p)
+  const { title, sub } = split(p)
 
   return (
     <article className="card" data-reveal style={{ transitionDelay: `${delay * 28}ms` }}>
@@ -26,7 +28,8 @@ export default function Card({ p, delay, onOpen }: Props) {
       </div>
       <div className="body">
         <div className="brand">{p.brand}</div>
-        <h3 onClick={onOpen}>{p.name}</h3>
+        <h3 onClick={onOpen}>{title}</h3>
+        {sub && <div className="sub" onClick={onOpen}>{sub}</div>}
         {p.spec && <div className="spec">{p.spec}</div>}
         <div className="row">
           <div className="price">
