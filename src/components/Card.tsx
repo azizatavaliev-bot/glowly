@@ -1,18 +1,18 @@
 import type { Product } from '../types'
 import { cover, photos } from '../photo'
+import { price, cityPrice, saving, som } from '../pricing'
+import { orderLink } from './ProductModal'
 
 type Props = {
   p: Product
-  qty: number
   delay: number
-  money: (usd: number) => string
-  setQty: (n: number) => void
   onOpen: () => void
 }
 
-export default function Card({ p, qty, delay, money, setQty, onOpen }: Props) {
+export default function Card({ p, delay, onOpen }: Props) {
   const pic = cover(p)
   const shots = photos(p).length
+  const save = saving(p)
 
   return (
     <article className="card" data-reveal style={{ transitionDelay: `${delay * 28}ms` }}>
@@ -20,29 +20,24 @@ export default function Card({ p, qty, delay, money, setQty, onOpen }: Props) {
         {pic
           ? <img src={pic} alt={p.name} loading="lazy" />
           : <div className="noimg">нет фото</div>}
-        {shots > 1 && <span className="shots">{shots} фото</span>}
         {p.sale && <span className="badge">{p.sale.replace('АКЦИЯ ', '−').replace(/ [KS]$/, '')}</span>}
+        {shots > 1 && <span className="shots">{shots} фото</span>}
         <span className="peek">подробнее</span>
       </div>
       <div className="body">
         <div className="brand">{p.brand}</div>
         <h3 onClick={onOpen}>{p.name}</h3>
         {p.spec && <div className="spec">{p.spec}</div>}
-        <div className="pack">{p.pack ?? '—'}{p.exp && ` · срок до ${p.exp}`}</div>
         <div className="row">
-          <div className="price">{money(p.price)}<em>/{p.unit}</em></div>
-          {qty > 0 ? (
-            <div className="qty">
-              <button onClick={() => setQty(qty - 1)}>−</button>
-              <input value={qty} onChange={e => setQty(Math.max(0, Number(e.target.value) || 0))} />
-              <button onClick={() => setQty(qty + 1)}>+</button>
-            </div>
-          ) : (
-            <button className="add" onClick={() => setQty(p.packQty ?? 1)}>
-              В заказ{p.packQty ? ` · ${p.packQty}` : ''}
-            </button>
-          )}
+          <div className="price">
+            {som(price(p))}
+            {save > 0 && <s>{som(cityPrice(p))}</s>}
+          </div>
         </div>
+        <a className="add wa-btn" href={orderLink(p)} target="_blank" rel="noreferrer"
+          onClick={e => e.stopPropagation()}>
+          Заказать
+        </a>
       </div>
     </article>
   )

@@ -7,16 +7,15 @@ import Marquee from './components/Marquee'
 import ProductModal from './components/ProductModal'
 import BrandPicker from './components/BrandPicker'
 import Dropdown from './components/Dropdown'
-import CartPanel from './components/CartPanel'
 import { useReveal } from './useReveal'
 import { cover } from './photo'
+import { price, som } from './pricing'
 
 const meta = data.meta as Meta
 const all = data.products as Product[]
 
 const WA = '996559050618'
-const RATE_KEY = 'korshop.rate'
-const CART_KEY = 'korshop.cart'
+const waLink = (text: string) => `https://wa.me/${WA}?text=${encodeURIComponent(text)}`
 
 type Sort = 'name' | 'price-asc' | 'price-desc'
 
@@ -26,20 +25,12 @@ export default function App() {
   const [brand, setBrand] = useState('Все')
   const [sort, setSort] = useState<Sort>('name')
   const [onlySale, setOnlySale] = useState(false)
-  const [kgs, setKgs] = useState(false)
-  const [rate, setRate] = useState(() => Number(localStorage.getItem(RATE_KEY)) || 87.5)
   const [limit, setLimit] = useState(48)
   const [open, setOpen] = useState<Product | null>(null)
-  const [cartOpen, setCartOpen] = useState(false)
   const [brandOpen, setBrandOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const catalogRef = useRef<HTMLDivElement>(null)
-  const [cart, setCart] = useState<Record<number, number>>(() => {
-    try { return JSON.parse(localStorage.getItem(CART_KEY) || '{}') } catch { return {} }
-  })
 
-  useEffect(() => { localStorage.setItem(CART_KEY, JSON.stringify(cart)) }, [cart])
-  useEffect(() => { localStorage.setItem(RATE_KEY, String(rate)) }, [rate])
   // ссылка вида ?p=123 открывает карточку товара сразу
   useEffect(() => {
     const id = Number(new URLSearchParams(location.search).get('p'))
@@ -60,9 +51,10 @@ export default function App() {
     window.addEventListener('scroll', on, { passive: true })
     return () => window.removeEventListener('scroll', on)
   }, [])
+
   useEffect(() => {
-    document.body.classList.toggle('locked', !!open || cartOpen || brandOpen)
-  }, [open, cartOpen, brandOpen])
+    document.body.classList.toggle('locked', !!open || brandOpen)
+  }, [open, brandOpen])
 
   const cats = useMemo(() => {
     const c = new Map<string, number>()
@@ -75,6 +67,7 @@ export default function App() {
     all.forEach(p => { c[p.brand] = (c[p.brand] ?? 0) + 1 })
     return c
   }, [])
+
   // в ленту акций — по одному товару на бренд, сначала самая большая скидка
   const sales = useMemo(() => {
     const pct = (p: Product) => Number(p.sale?.match(/(\d+)%/)?.[1] ?? 0)
@@ -85,6 +78,7 @@ export default function App() {
       .filter(p => !seen.has(p.brand) && seen.add(p.brand))
       .slice(0, 12)
   }, [])
+
   // три ленты фото в шапке: по одному товару на бренд, чтобы витрина выглядела разной
   const columns = useMemo(() => {
     const seen = new Set<string>()
@@ -101,7 +95,7 @@ export default function App() {
       if (brand !== 'Все' && p.brand !== brand) return false
       if (onlySale && !p.sale) return false
       if (!words.length) return true
-      const hay = `${p.full} ${p.spec ?? ''} ${p.barcode ?? ''}`.toLowerCase()
+      const hay = `${p.full} ${p.spec ?? ''}`.toLowerCase()
       return words.every(w => hay.includes(w))
     })
     return [...r].sort((a, b) =>
@@ -113,24 +107,8 @@ export default function App() {
   useEffect(() => { setLimit(48) }, [q, cat, brand, sort, onlySale])
   useReveal([list, limit])
 
-  const money = (usd: number) =>
-    kgs ? `${Math.round(usd * rate).toLocaleString('ru-RU')} с` : `$${usd.toFixed(2)}`
-
-  const setQty = (id: number, n: number) =>
-    setCart(c => {
-      const next = { ...c }
-      if (n <= 0) delete next[id]; else next[id] = n
-      return next
-    })
-
   const toCatalog = () => catalogRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   const pickBrand = (b: string) => { setBrand(b); setCat('Все'); toCatalog() }
-
-  const cartItems = Object.entries(cart)
-    .map(([id, qty]) => ({ p: all.find(x => x.id === Number(id))!, qty }))
-    .filter(x => x.p)
-  const total = cartItems.reduce((s, x) => s + x.p.price * x.qty, 0)
-  const count = cartItems.reduce((s, x) => s + x.qty, 0)
 
   return (
     <>
@@ -140,31 +118,33 @@ export default function App() {
             KOR<span>SHOP</span>
           </button>
           <div className="top-right">
-            <div className="cur">
-              <button className={!kgs ? 'on' : ''} onClick={() => setKgs(false)}>USD</button>
-              <button className={kgs ? 'on' : ''} onClick={() => setKgs(true)}>сом</button>
-              {kgs && (
-                <input className="rate" type="number" value={rate} step="0.5"
-                  onChange={e => setRate(Number(e.target.value) || 0)} title="курс USD→KGS" />
-              )}
-            </div>
-            <a className="wa" href={`https://wa.me/${WA}`} target="_blank" rel="noreferrer">WhatsApp</a>
-            <button className="cart-btn" onClick={() => setCartOpen(true)}>
-              Заказ{count > 0 && <b>{count}</b>}
-            </button>
+            <span className="city">Бишкек</span>
+            <a className="cart-btn" href={waLink('Здравствуйте! Хочу спросить про корейскую косметику.')}
+              target="_blank" rel="noreferrer">
+              Написать в WhatsApp
+            </a>
           </div>
         </div>
       </header>
 
       <Hero total={all.length} brands={brands.length - 1} date={meta.date}
-        columns={columns} onStart={toCatalog} />
+        columns={columns} onStart={toCatalog} wa={waLink('Здравствуйте! Хочу подобрать уход 🙂')} />
 
       <Marquee items={brands.slice(1)} onPick={pickBrand} />
+
+      <section className="perks" data-reveal>
+        <div className="wrap perks-in">
+          <div><b>🇰🇷 Оригинал из Кореи</b><span>Везём напрямую со склада, без перекупов</span></div>
+          <div><b>💸 Дешевле города</b><span>Цены ниже магазинных — сравнение в каждой карточке</span></div>
+          <div><b>🚚 Доставка по Бишкеку</b><span>Привезём день в день, оплата при получении</span></div>
+          <div><b>💬 Подберём уход</b><span>Напишите в WhatsApp — поможем выбрать под вашу кожу</span></div>
+        </div>
+      </section>
 
       {!!sales.length && (
         <section className="sales" data-reveal>
           <div className="wrap sales-head">
-            <h2>Акции склада</h2>
+            <h2>Скидки недели</h2>
             <button className="link" onClick={() => { setOnlySale(true); toCatalog() }}>
               смотреть все →
             </button>
@@ -176,7 +156,7 @@ export default function App() {
                 <span className="badge">{p.sale!.replace('АКЦИЯ ', '−').replace(/ [KS]$/, '')}</span>
                 <b>{p.brand}</b>
                 <i>{p.name}</i>
-                <u>{money(p.price)}</u>
+                <u>{som(price(p))}</u>
               </button>
             ))}
           </div>
@@ -191,7 +171,7 @@ export default function App() {
         <div className="sticky">
           <div className="wrap">
             <div className="tools">
-              <input className="search" placeholder="Поиск: название, бренд, штрихкод…"
+              <input className="search" placeholder="Что ищете? Крем, тонер, ANUA…"
                 value={q} onChange={e => setQ(e.target.value)} />
               <button className={brand === 'Все' ? 'dd-btn wide' : 'dd-btn wide on'}
                 onClick={() => setBrandOpen(true)}>
@@ -204,7 +184,7 @@ export default function App() {
               ]} />
               <label className="chk">
                 <input type="checkbox" checked={onlySale} onChange={e => setOnlySale(e.target.checked)} />
-                Только акции
+                Только скидки
               </label>
             </div>
             <div className="cats">
@@ -229,8 +209,7 @@ export default function App() {
 
           <div className="grid">
             {list.slice(0, limit).map((p, i) => (
-              <Card key={p.id} p={p} money={money} qty={cart[p.id] || 0} delay={i % 12}
-                setQty={n => setQty(p.id, n)} onOpen={() => setOpen(p)} />
+              <Card key={p.id} p={p} delay={i % 12} onOpen={() => setOpen(p)} />
             ))}
           </div>
 
@@ -239,19 +218,55 @@ export default function App() {
               Показать ещё <b>{Math.min(48, list.length - limit)}</b> из {list.length - limit}
             </button>
           )}
-          {!list.length && <div className="empty">Ничего не нашлось. Попробуй другой запрос.</div>}
+          {!list.length && (
+            <div className="empty">
+              Ничего не нашлось.{' '}
+              <a href={waLink('Здравствуйте! Ищу товар, которого нет на сайте.')} target="_blank" rel="noreferrer">
+                Напишите нам — привезём под заказ
+              </a>
+            </div>
+          )}
         </div>
       </div>
+
+      <section className="how" data-reveal>
+        <div className="wrap">
+          <h2 className="sec-title">Как заказать</h2>
+          <div className="how-grid">
+            <div><span>1</span><b>Выбираете товар</b><p>Жмёте «Заказать» — откроется WhatsApp с уже готовым сообщением.</p></div>
+            <div><span>2</span><b>Мы подтверждаем</b><p>Проверяем наличие, называем срок доставки и итоговую сумму.</p></div>
+            <div><span>3</span><b>Получаете и платите</b><p>Курьер по Бишкеку, оплата наличными или переводом при получении.</p></div>
+          </div>
+          <a className="add big wa-btn how-cta" href={waLink('Здравствуйте! Хочу заказать корейскую косметику 🙂')}
+            target="_blank" rel="noreferrer">
+            Написать в WhatsApp
+          </a>
+        </div>
+      </section>
+
+      <section className="faq" data-reveal>
+        <div className="wrap">
+          <h2 className="sec-title">Частые вопросы</h2>
+          <div className="faq-grid">
+            <details><summary>Это оригинал?</summary><p>Да. Товар приходит со склада корейского поставщика, с корейскими штрихкодами и сроками годности на упаковке.</p></details>
+            <details><summary>Сколько идёт доставка?</summary><p>По Бишкеку — обычно в день заказа или на следующий. В регионы отправляем транспортной компанией.</p></details>
+            <details><summary>Можно посмотреть перед покупкой?</summary><p>Да, курьер привозит заказ, вы проверяете упаковку и срок годности, потом оплачиваете.</p></details>
+            <details><summary>А если не подойдёт?</summary><p>Напишите нам в WhatsApp — поможем подобрать замену. Вскрытую косметику по закону вернуть нельзя, поэтому лучше сначала спросить совета.</p></details>
+            <details><summary>Есть опт?</summary><p>Да, для салонов и магазинов условия отдельные. Напишите в WhatsApp, обсудим объём и цену.</p></details>
+            <details><summary>Почему у вас дешевле?</summary><p>Возим напрямую со склада в Корее и не платим за аренду торговой точки в центре.</p></details>
+          </div>
+        </div>
+      </section>
 
       <footer>
         <div className="wrap foot-in">
           <div>
             <div className="foot-logo">KOR<span>SHOP</span></div>
-            <p>Корейская косметика оптом. Прайс от {meta.date}, цены в USD за штуку.
-              Наличие уточняйте перед заказом.</p>
+            <p>Корейская косметика в Бишкеке. Цены в сомах, доставка по городу,
+              оплата при получении. Наличие уточняйте в WhatsApp.</p>
           </div>
           <div className="foot-links">
-            <a href={`https://wa.me/${WA}`} target="_blank" rel="noreferrer">WhatsApp {meta.contact}</a>
+            <a href={waLink('Здравствуйте!')} target="_blank" rel="noreferrer">WhatsApp {meta.contact}</a>
             <a href={`https://${meta.site}`} target="_blank" rel="noreferrer">{meta.site}</a>
           </div>
         </div>
@@ -260,11 +275,6 @@ export default function App() {
       {open && (
         <ProductModal
           p={open}
-          money={money}
-          kgs={kgs}
-          rate={rate}
-          qty={cart[open.id] || 0}
-          setQty={n => setQty(open.id, n)}
           onClose={() => setOpen(null)}
           onBrand={pickBrand}
           onOpen={setOpen}
@@ -284,14 +294,10 @@ export default function App() {
         />
       )}
 
-      {cartOpen && <CartPanel items={cartItems} total={total} money={money} wa={WA}
-        setQty={setQty} onClose={() => setCartOpen(false)} clear={() => setCart({})} />}
-
-      {count > 0 && !cartOpen && !open && (
-        <button className="fab" onClick={() => setCartOpen(true)}>
-          <b>{count}</b> поз. · {money(total)} <span>оформить →</span>
-        </button>
-      )}
+      <a className="fab wa-fab" href={waLink('Здравствуйте! Есть вопрос по косметике 🙂')}
+        target="_blank" rel="noreferrer">
+        💬 Написать нам
+      </a>
     </>
   )
 }

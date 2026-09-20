@@ -1,15 +1,12 @@
 import { useEffect, useState } from 'react'
-import type { Product } from '../types'
-import { summary, volume, money, benefits, forWhom, steps, tags } from '../describe'
+import type { Product, Video } from '../types'
+import { summary, volume, benefits, forWhom, steps } from '../describe'
 import { photos } from '../photo'
+import { price, cityPrice, saving, som } from '../pricing'
+import videos from '../data/videos.json'
 
 type Props = {
   p: Product
-  qty: number
-  kgs: boolean
-  rate: number
-  money: (usd: number) => string
-  setQty: (n: number) => void
   onClose: () => void
   onBrand: (b: string) => void
   similar: Product[]
@@ -20,20 +17,22 @@ type Props = {
 
 const WA = '996559050618'
 
-export default function ProductModal({
-  p, qty, money: fmt, setQty, onClose, onBrand, similar, onOpen, prev, next,
-}: Props) {
+export function orderLink(p: Product): string {
+  const text = `Здравствуйте! Хочу заказать:\n${p.name}${p.spec ? ` (${p.spec})` : ''}\n${p.brand} · ${som(price(p))}\n\nПодскажите, есть в наличии?`
+  return `https://wa.me/${WA}?text=${encodeURIComponent(text)}`
+}
+
+export default function ProductModal({ p, onClose, onBrand, similar, onOpen, prev, next }: Props) {
+  const [shot, setShot] = useState(0)
   const v = volume(p)
-  const m = money(p)
+  const shots = photos(p)
   const good = benefits(p)
   const who = forWhom(p)
   const how = steps(p)
-  const acts = tags(p)
-  const shots = photos(p)
-  const [shot, setShot] = useState(0)
-  const [copied, setCopied] = useState(false)
-  useEffect(() => { setShot(0); setCopied(false) }, [p.id])
+  const clip = (videos as Record<string, Video[]>)[String(p.id)]?.[0]
+  const save = saving(p)
 
+  useEffect(() => { setShot(0) }, [p.id])
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -43,18 +42,6 @@ export default function ProductModal({
     document.addEventListener('keydown', key)
     return () => document.removeEventListener('keydown', key)
   }, [onClose, onOpen, prev, next])
-
-  const share = () => {
-    const url = `${location.origin}${location.pathname}?p=${p.id}`
-    navigator.clipboard.writeText(url)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
-
-  const ask = () => {
-    const text = `Здравствуйте! Интересует: ${p.full}${p.spec ? ` [${p.spec}]` : ''}, штрихкод ${p.barcode ?? '—'}. Цена $${p.price.toFixed(2)}. Есть в наличии?`
-    window.open(`https://wa.me/${WA}?text=${encodeURIComponent(text)}`, '_blank')
-  }
 
   return (
     <div className="overlay" onClick={onClose}>
@@ -83,16 +70,9 @@ export default function ProductModal({
           )}
           <div className="m-facts">
             {v.text !== '—' && <div><span>Объём</span><b>{v.text}</b></div>}
-            {p.pack && <div><span>Упаковка</span><b>{p.pack}</b></div>}
-            {p.barcode && (
-              <div>
-                <span>Штрихкод</span>
-                <b className="mono">{p.barcode.trim().split(/\s+/).join(' / ')}</b>
-              </div>
-            )}
+            <div><span>Страна</span><b>Корея 🇰🇷</b></div>
             {p.exp && <div><span>Годен до</span><b>{p.exp}</b></div>}
             <div><span>Категория</span><b>{p.cat}</b></div>
-            {p.sale && <div><span>Акция</span><b>{p.sale.replace(/ [KS]$/, '')}</b></div>}
           </div>
         </div>
 
@@ -104,15 +84,25 @@ export default function ProductModal({
           {p.spec && <div className="spec big">{p.spec}</div>}
 
           <div className="m-price">
-            <div className="price big">{fmt(p.price)}<em>/{p.unit}</em></div>
-            {m.perMl && <span className="per">{fmt(m.perMl)} за 1 {v.text.includes('г') ? 'г' : 'мл'}</span>}
+            <div className="price big">{som(price(p))}</div>
+            {save > 0 && (
+              <div className="save">
+                <s>{som(cityPrice(p))}</s>
+                <span>выгода {som(save)}</span>
+              </div>
+            )}
           </div>
+
+          <a className="add big wa-btn" href={orderLink(p)} target="_blank" rel="noreferrer">
+            Заказать в WhatsApp
+          </a>
+          <div className="pay-note">Ответим в течение дня · доставка по Бишкеку · оплата при получении</div>
 
           <p className="what">{summary(p)}</p>
 
           <section className="sec">
             <div className="sec-h">Чем полезен</div>
-            <ul className="dots">
+            <ul className="dots plain">
               {good.map(b => <li key={b}>{b}</li>)}
             </ul>
           </section>
@@ -131,61 +121,19 @@ export default function ProductModal({
             </ol>
           </section>
 
-          {!!acts.length && (
+          {clip && (
             <section className="sec">
-              <div className="sec-h">Активные компоненты</div>
-              <div className="acts">
-                {acts.map(a => (
-                  <div className="act" key={a.label}>
-                    <b>{a.label}</b>
-                    <span>{a.text}</span>
-                  </div>
-                ))}
-              </div>
+              <div className="sec-h">Видеообзор</div>
+              <a className="clip" href={`https://www.youtube.com/watch?v=${clip.v}`} target="_blank" rel="noreferrer">
+                <img src={`https://i.ytimg.com/vi/${clip.v}/hqdefault.jpg`} alt="" loading="lazy" />
+                <div className="clip-b">
+                  <b>{clip.title}</b>
+                  <span>{clip.ch}{clip.len ? ` · ${clip.len}` : ''}</span>
+                </div>
+                <span className="play">▶</span>
+              </a>
             </section>
           )}
-
-          <div className="calc">
-            <div className="calc-head"><span>Цены</span></div>
-            <div className="calc-grid">
-              <div><span>Закуп за штуку</span><b>{fmt(p.price)}</b></div>
-              {m.box
-                ? <div><span>Короб {m.boxQty} шт</span><b>{fmt(m.box)}</b></div>
-                : <div><span>Упаковка</span><b>{p.pack ?? '—'}</b></div>}
-              {m.perMl && (
-                <div className="wide">
-                  <span>Цена за 1 {v.text.includes('г') ? 'г' : 'мл'}</span>
-                  <b>{fmt(m.perMl)}</b>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="m-actions">
-            {qty > 0 ? (
-              <div className="qty big">
-                <button onClick={() => setQty(qty - 1)}>−</button>
-                <input value={qty} onChange={e => setQty(Math.max(0, Number(e.target.value) || 0))} />
-                <button onClick={() => setQty(qty + 1)}>+</button>
-              </div>
-            ) : (
-              <button className="add big" onClick={() => setQty(p.packQty ?? 1)}>
-                В заказ{p.packQty ? ` · короб ${p.packQty} шт` : ''}
-              </button>
-            )}
-            <div className="m-sub">
-              <button className="ghost-sm" onClick={ask}>Спросить в WhatsApp</button>
-              <button className="ghost-sm" onClick={share}>
-                {copied ? 'Ссылка скопирована' : 'Ссылка на товар'}
-              </button>
-              {p.barcode && (
-                <button className="ghost-sm" onClick={() => navigator.clipboard.writeText(p.barcode!)}>
-                  Копировать штрихкод
-                </button>
-              )}
-            </div>
-            {qty > 0 && <div className="sum">В заказе: {qty} {p.unit} на {fmt(p.price * qty)}</div>}
-          </div>
 
           {!!similar.length && (
             <div className="similar">
@@ -195,7 +143,7 @@ export default function ProductModal({
                   <button key={s.id} onClick={() => onOpen(s)}>
                     {photos(s)[0] && <img src={photos(s)[0]} alt="" />}
                     <i>{s.name}</i>
-                    <u>{fmt(s.price)}</u>
+                    <u>{som(price(s))}</u>
                   </button>
                 ))}
               </div>

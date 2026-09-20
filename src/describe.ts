@@ -270,7 +270,25 @@ export function summary(p: Product): string {
   return [first, second, third].filter(Boolean).join(' ')
 }
 
-/** Польза: 2–5 пунктов. */
+const EMOJI: [RegExp, string][] = [
+  [/ультрафиолет|солнц|spf/i, '☀️'],
+  [/влаг|увлаж|гиалурон/i, '💧'],
+  [/высыпан|акне|воспален/i, '🎯'],
+  [/пор|чёрны/i, '🫧'],
+  [/тон|сиян|пигмент/i, '✨'],
+  [/морщин|подтягива|упруг|возраст/i, '⏳'],
+  [/успокаива|раздражен|чувствительн/i, '🌿'],
+  [/барьер|восстанавлива|керамид/i, '🛡️'],
+  [/блеск|матир|себум/i, '🪞'],
+  [/отшелушива|кислот/i, '🧴'],
+  [/волос|корн|перхот/i, '💇'],
+  [/губ|цвет/i, '💋'],
+  [/очищ|смыва/i, '🧼'],
+  [/питает|сухост/i, '🍯'],
+]
+const emojiFor = (line: string) => (EMOJI.find(([re]) => re.test(line)) ?? [null, '💚'])[1]
+
+/** Польза: 2–5 пунктов, каждый со своим смайликом. */
 export function benefits(p: Product): string[] {
   const out: string[] = []
   for (const pur of purposes(p)) if (!out.includes(pur.benefit)) out.push(pur.benefit)
@@ -298,7 +316,7 @@ export function benefits(p: Product): string[] {
     const line = byCat[p.cat]
     if (line && !out.includes(line)) out.push(line)
   }
-  return out.slice(0, 5)
+  return out.slice(0, 5).map(line => `${emojiFor(line)} ${line}`)
 }
 
 /** Кому подойдёт. */

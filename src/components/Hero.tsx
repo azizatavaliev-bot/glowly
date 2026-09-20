@@ -1,5 +1,6 @@
 import type { Product } from '../types'
 import { cover } from '../photo'
+import { price, som } from '../pricing'
 
 type Props = {
   total: number
@@ -7,34 +8,35 @@ type Props = {
   date: string
   columns: Product[][]
   onStart: () => void
+  wa: string
 }
 
-export default function Hero({ total, brands, date, columns, onStart }: Props) {
+export default function Hero({ total, brands, columns, onStart, wa }: Props) {
   return (
     <section className="hero">
       <div className="hero-bg" aria-hidden />
       <div className="wrap hero-in">
         <div className="hero-txt">
-          <span className="pill">Прямые поставки из Кореи</span>
+          <span className="pill">Доставка по Бишкеку · оплата при получении</span>
           <h1>
-            Косметика,<br />
-            которую <i>ждут</i><br />
-            полки
+            Корейский уход<br />
+            по ценам <i>ниже</i><br />
+            магазинов
           </h1>
           <p>
-            {total} позиций и {brands} брендов на складе. Отгружаем коробами,
-            цена в долларах за штуку — без наценок посредников.
+            {total} средств и {brands} корейских брендов в наличии. Привозим напрямую со склада,
+            поэтому у нас дешевле, чем в городе.
           </p>
           <div className="hero-cta">
             <button className="btn-main" onClick={onStart}>Смотреть каталог</button>
-            <a className="btn-ghost" href="https://wa.me/996559050618" target="_blank" rel="noreferrer">
-              Запросить прайс
+            <a className="btn-ghost" href={wa} target="_blank" rel="noreferrer">
+              Подобрать уход в WhatsApp
             </a>
           </div>
           <dl className="stats">
-            <div><dt>{total}</dt><dd>позиций в наличии</dd></div>
-            <div><dt>{brands}</dt><dd>брендов Кореи</dd></div>
-            <div><dt>{date.split(' ').slice(0, 2).join(' ')}</dt><dd>прайс обновлён</dd></div>
+            <div><dt>{total}</dt><dd>средств в наличии</dd></div>
+            <div><dt>{brands}</dt><dd>корейских брендов</dd></div>
+            <div><dt>1 день</dt><dd>доставка по городу</dd></div>
           </dl>
         </div>
 
@@ -47,7 +49,7 @@ export default function Hero({ total, brands, date, columns, onStart }: Props) {
                     <img src={cover(p) ?? ''} alt="" loading={j < 3 ? 'eager' : 'lazy'} />
                     <figcaption>
                       <b>{p.brand}</b>
-                      <u>${p.price.toFixed(2)}</u>
+                      <u>{som(price(p))}</u>
                     </figcaption>
                   </figure>
                 ))}

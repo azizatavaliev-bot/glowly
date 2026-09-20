@@ -22,3 +22,5 @@ export type Meta = {
   site: string
   contact: string
 }
+
+export type Video = { v: string; title: string; ch: string; len: string }
