@@ -117,11 +117,11 @@ export default function App() {
       <header className={scrolled ? 'top solid' : 'top'}>
         <div className="wrap top-in">
           <button className="logo" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            KOR<span>SHOP</span>
+            GLOW<span>LY</span>
           </button>
           <div className="top-right">
             <span className="city">Бишкек</span>
-            <a className="cart-btn" href={waLink('Здравствуйте! Хочу спросить про корейскую косметику.')}
+            <a className="cart-btn" href={waLink('Здравствуйте! Пишу с сайта GLOWLY — хочу спросить про косметику 🙂')}
               target="_blank" rel="noreferrer">
               Написать в WhatsApp
             </a>
@@ -130,7 +130,7 @@ export default function App() {
       </header>
 
       <Hero total={all.length} brands={brands.length - 1} date={meta.date}
-        columns={columns} onStart={toCatalog} wa={waLink('Здравствуйте! Хочу подобрать уход 🙂')} />
+        columns={columns} onStart={toCatalog} wa={waLink('Здравствуйте! Пишу с сайта GLOWLY — помогите подобрать уход 🙂')} />
 
       <Marquee items={brands.slice(1)} onPick={pickBrand} />
 
@@ -252,7 +252,7 @@ export default function App() {
           {!list.length && (
             <div className="empty">
               Ничего не нашлось.{' '}
-              <a href={waLink('Здравствуйте! Ищу товар, которого нет на сайте.')} target="_blank" rel="noreferrer">
+              <a href={waLink('Здравствуйте! Пишу с сайта GLOWLY — ищу товар, которого нет в каталоге.')} target="_blank" rel="noreferrer">
                 Напишите нам — привезём под заказ
               </a>
             </div>
@@ -268,7 +268,7 @@ export default function App() {
             <div><span>2</span><b>Мы подтверждаем</b><p>Проверяем наличие, называем срок доставки и итоговую сумму.</p></div>
             <div><span>3</span><b>Получаете и платите</b><p>Курьер по Бишкеку, оплата наличными или переводом при получении.</p></div>
           </div>
-          <a className="add big wa-btn how-cta" href={waLink('Здравствуйте! Хочу заказать корейскую косметику 🙂')}
+          <a className="add big wa-btn how-cta" href={waLink('Здравствуйте! Пишу с сайта GLOWLY — хочу заказать 🙂')}
             target="_blank" rel="noreferrer">
             Написать в WhatsApp
           </a>
@@ -292,13 +292,13 @@ export default function App() {
       <footer>
         <div className="wrap foot-in">
           <div>
-            <div className="foot-logo">KOR<span>SHOP</span></div>
-            <p>Корейская косметика в Бишкеке. Цены в сомах, доставка по городу,
+            <div className="foot-logo">GLOW<span>LY</span></div>
+            <p>GLOWLY — корейская косметика в Бишкеке. Цены в сомах, доставка по городу,
               оплата при получении. Наличие уточняйте в WhatsApp.</p>
           </div>
           <div className="foot-links">
             <a href={waLink('Здравствуйте!')} target="_blank" rel="noreferrer">WhatsApp {meta.contact}</a>
-            <a href={`https://${meta.site}`} target="_blank" rel="noreferrer">{meta.site}</a>
+            <a href={waLink('Здравствуйте! Интересует опт.')} target="_blank" rel="noreferrer">Опт и салонам</a>
           </div>
         </div>
       </footer>
@@ -325,7 +325,7 @@ export default function App() {
         />
       )}
 
-      <a className="fab wa-fab" href={waLink('Здравствуйте! Есть вопрос по косметике 🙂')}
+      <a className="fab wa-fab" href={waLink('Здравствуйте! Пишу с сайта GLOWLY — есть вопрос 🙂')}
         target="_blank" rel="noreferrer">
         💬 Написать нам
       </a>

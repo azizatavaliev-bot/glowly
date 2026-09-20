@@ -19,7 +19,7 @@ type Props = {
 const WA = '996559050618'
 
 export function orderLink(p: Product): string {
-  const text = `Здравствуйте! Хочу заказать:\n${full(p)}${p.spec ? ` (${p.spec})` : ''}\n${p.brand} · ${som(price(p))}\n\nПодскажите, есть в наличии?`
+  const text = `Здравствуйте! Пишу с сайта GLOWLY, хочу заказать:\n${full(p)}${p.spec ? ` (${p.spec})` : ''}\n${p.brand} · ${som(price(p))}\n\nПодскажите, есть в наличии?`
   return `https://wa.me/${WA}?text=${encodeURIComponent(text)}`
 }
 
