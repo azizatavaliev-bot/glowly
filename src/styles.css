@@ -511,7 +511,7 @@ footer { margin-top: 70px; background: var(--dark); color: rgba(255,255,255,.6);
 
 /* ───── mobile ───── */
 @media (max-width: 980px) {
-  .hero-in { grid-template-columns: 1fr; gap: 30px; }
+  .hero-in { grid-template-columns: minmax(0, 1fr); gap: 30px; }
   .lanes { height: 420px; gap: 12px; }
 }
 @media (max-width: 720px) {
@@ -828,4 +828,104 @@ a.cart-btn { text-decoration: none; }
   .modal .thumbs { order: 2; padding: 10px 16px 0; }
   .modal .m-body { order: 3; }
   .modal .m-facts { order: 4; margin: 0 16px 20px; }
+}
+
+/* ═══ мобильная главная: 98% людей заходят с телефона ══════════════ */
+.only-narrow, .stats-line, .hero-rail, .mbar, .top-search { display: none; }
+
+@media (max-width: 720px) {
+  .only-wide { display: none; }
+  .only-narrow { display: inline; }
+
+  /* первый экран целиком помещается в телефон: заголовок, поиск, кнопка, хиты */
+  .hero { padding: 84px 0 22px; min-height: auto; }
+  .hero h1 { font-size: clamp(27px, 8.5vw, 34px); margin-bottom: 12px; }
+  .pill { margin-bottom: 14px; padding: 7px 13px 7px 11px; font-size: 11.5px; }
+  .hero p { font-size: 14.5px; margin-bottom: 16px; }
+  .hero-search { margin-bottom: 12px; gap: 6px; }
+  .hero-search input { padding: 14px 16px; font-size: 15px; }   /* 15px — iOS не зумит поле */
+  .hero-search > button { padding: 14px; font-size: 15px; }
+  .hero-cta { gap: 8px; }
+  .hero-cta .btn-main, .hero-cta .btn-ghost { padding: 14px 18px; font-size: 14.5px; }
+  /* три больших числа съедали экран — на телефоне одна строка */
+  .stats { display: none; }
+  .stats-line { display: block; margin-top: 14px; color: var(--mut); font-size: 13px; }
+  .stats-line b { color: var(--ink); font-weight: 800; }
+
+  /* декоративные ленты прячем, вместо них настоящие хиты с ценами */
+  .lanes { display: none; }
+  .hero-in { min-width: 0; }
+  .hero-txt { min-width: 0; }
+  .hero-rail { display: block; min-width: 0; width: calc(100% + 32px); margin: 20px -16px 0; }
+  .hero-rail .rail { min-width: 0; max-width: 100%; }
+  .hero-rail-h { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--mut); padding: 0 16px 10px; }
+  .hero-rail .rail { padding: 2px 16px 10px; gap: 10px; }
+  .hero-rail .sale-card { flex: 0 0 132px; padding: 9px; border-radius: 13px; }
+  .hero-rail .sale-card i { height: 28px; font-size: 11.5px; }
+  .hero-rail .sale-card u { font-size: 14px; }
+  .hero-rail .sale-card b { font-size: 9.5px; }
+
+  /* «Смотреть каталог» дублирует нижнюю панель — на телефоне она лишняя */
+  .hero-cta .btn-main { display: none; }
+  .hero-cta .btn-ghost { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  /* компактный поиск в шапке — появляется вместе с матовой подложкой */
+  .top.solid .top-search {
+    display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; margin: 0 8px;
+    border: 1px solid var(--line); background: #fff; border-radius: 11px;
+    padding: 9px 12px; font-size: 13px; color: var(--mut); text-align: left;
+  }
+  .top-search span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .top.solid .logo { font-size: 17px; }
+  .top.solid .city { display: none; }
+  /* при активном поиске кнопка сжимается до иконки, чтобы строке хватило места */
+  .top.solid .cart-btn { font-size: 0; padding: 9px 12px; }
+  .top.solid .cart-btn::after { content: '💬'; font-size: 17px; }
+  .top.solid .fav-btn { width: 36px; height: 36px; font-size: 16px; }
+  .top.solid .top-right { gap: 6px; }
+
+  /* нижняя панель: главные действия под большим пальцем */
+  .mbar {
+    display: grid; grid-template-columns: repeat(4, 1fr); position: fixed; z-index: 46;
+    left: 0; right: 0; bottom: 0; background: rgba(255,255,255,.94); backdrop-filter: blur(14px);
+    border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom);
+  }
+  .mbar button, .mbar a {
+    display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 9px 4px 8px;
+    border: 0; background: none; text-decoration: none; color: var(--mut);
+    font-size: 10.5px; font-weight: 600; min-height: 54px;
+  }
+  .mbar span { font-size: 19px; line-height: 1; position: relative; }
+  .mbar i { position: absolute; top: -5px; right: -12px; background: var(--acc); color: #fff;
+    font-style: normal; font-size: 9.5px; font-weight: 700; padding: 1px 5px; border-radius: 20px; }
+  .mbar-wa { color: #1aa053 !important; }
+  .mbar button:active { background: #f6f2ee; }
+
+  /* «Почему мы» — плиткой 2×2, а не четырьмя экранами текста */
+  .perks { padding: 28px 0 4px; }
+  .perks-in { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .perks-in > div { padding: 12px; border-radius: 13px; }
+  .perks-in b { font-size: 13px; margin-bottom: 4px; }
+  .perks-in span { font-size: 11.5px; line-height: 1.4; }
+  .sales, .recent { padding-top: 32px; }
+  .sales-head h2 { font-size: 21px; }
+  .how { padding: 36px 0 6px; }
+  .faq { padding: 34px 0 6px; }
+  footer { margin-top: 34px; padding: 30px 0 34px; }
+
+  /* всё, что раньше липло к низу, уезжает выше панели */
+  body { padding-bottom: 58px; }
+  .wa-fab { display: none; }
+  .to-top { bottom: 72px; right: 12px; }
+  .toast { bottom: 72px; }
+  .cart, .modal { margin-bottom: 0; }
+  .overlay { padding-bottom: 58px; }
+}
+
+/* очень узкие экраны — ещё компактнее */
+@media (max-width: 380px) {
+  .hero h1 { font-size: 26px; }
+  .hero-rail .sale-card { flex: 0 0 122px; }
+  .mbar button, .mbar a { font-size: 10px; }
 }

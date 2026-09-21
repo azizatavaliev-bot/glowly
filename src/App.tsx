@@ -17,6 +17,7 @@ import { saving } from './pricing'
 import { useFavorites, useRecent } from './store'
 import FavPanel from './components/FavPanel'
 import Toast from './components/Toast'
+import MobileBar from './components/MobileBar'
 import RoutineBuilder from './components/RoutineBuilder'
 
 const meta = data.meta as Meta
@@ -45,6 +46,7 @@ export default function App() {
   const recentItems = recent.ids.map(id => all.find(p => p.id === id)).filter((p): p is Product => !!p)
   const [scrolled, setScrolled] = useState(false)
   const catalogRef = useRef<HTMLDivElement>(null)
+  const toRoutine = () => document.getElementById('routine')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
   // ссылка вида ?p=123 открывает карточку товара сразу
   useEffect(() => {
@@ -170,6 +172,11 @@ export default function App() {
           <button className="logo" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
             GLOW<span>LY</span>
           </button>
+          <button className="top-search" onClick={() => {
+            const el = document.querySelector<HTMLInputElement>('.catalog .search')
+            el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            setTimeout(() => el?.focus(), 400)
+          }} aria-label="Поиск">🔍<span>Поиск</span></button>
           <div className="top-right">
             <span className="city">Бишкек</span>
             <button className="fav-btn" onClick={() => setFavOpen(true)} aria-label="Избранное">
@@ -424,6 +431,10 @@ export default function App() {
         target="_blank" rel="noreferrer">
         💬 Написать нам
       </a>
+
+      <MobileBar favCount={fav.ids.length} onCatalog={toCatalog} onRoutine={toRoutine}
+        onFav={() => setFavOpen(true)}
+        wa={waLink('Здравствуйте! Пишу с сайта GLOWLY 🙂')} />
     </>
   )
 }

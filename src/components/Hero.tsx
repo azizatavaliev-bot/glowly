@@ -87,8 +87,13 @@ export default function Hero({ all, total, brands, columns, onStart, onSearch, o
             </span>
           </h1>
           <p>
-            {total} средств и {brands} корейских брендов. Привозим напрямую со склада,
-            поэтому дешевле, чем в городе.
+            <span className="only-wide">
+              {total} средств и {brands} корейских брендов. Привозим напрямую со склада,
+              поэтому дешевле, чем в городе.
+            </span>
+            <span className="only-narrow">
+              {total} средств из Кореи. Дешевле, чем в городе.
+            </span>
           </p>
 
           <div className={focus && hits.length ? 'hero-search open' : 'hero-search'}>
@@ -125,6 +130,23 @@ export default function Hero({ all, total, brands, columns, onStart, onSearch, o
             <div><dt>{n2}</dt><dd>корейских брендов</dd></div>
             <div><dt>1 день</dt><dd>доставка по городу</dd></div>
           </dl>
+          <div className="stats-line">
+            <b>{total}</b> средств · <b>{brands}</b> брендов · доставка <b>за день</b>
+          </div>
+        </div>
+
+        <div className="hero-rail">
+          <div className="hero-rail-h">Хиты продаж</div>
+          <div className="rail">
+            {columns.flat().slice(0, 12).map(p => (
+              <button className="sale-card" key={p.id} onClick={() => onOpen(p)}>
+                <img src={cover(p) ?? ''} alt="" loading="lazy" />
+                <b>{p.brand}</b>
+                <i>{split(p).title}</i>
+                <u>{som(price(p))}</u>
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="lanes" aria-hidden>
