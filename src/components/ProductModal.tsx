@@ -6,6 +6,7 @@ import { price, cityPrice, saving, som } from '../pricing'
 import { split, full } from '../name'
 import videos from '../data/videos.json'
 import { useFavorites, useRecent } from '../store'
+import { toast } from './Toast'
 
 type Props = {
   p: Product
@@ -26,6 +27,7 @@ export function orderLink(p: Product): string {
 
 export default function ProductModal({ p, onClose, onBrand, similar, onOpen, prev, next }: Props) {
   const [shot, setShot] = useState(0)
+  const [zoom, setZoom] = useState(false)
   const v = volume(p)
   const shots = photos(p)
   const good = benefits(p)
@@ -66,12 +68,19 @@ export default function ProductModal({ p, onClose, onBrand, similar, onOpen, pre
         </div>
 
         <div className="m-left">
-          <div className="m-pic">
+          <div className={shots.length ? 'm-pic zoomable' : 'm-pic'} onClick={() => shots.length && setZoom(true)}>
             {shots.length
               ? <img src={shots[shot]} alt={p.name} key={shots[shot]} />
               : <div className="noimg">нет фото</div>}
             {p.sale && <span className="badge">{p.sale.replace('АКЦИЯ ', '−').replace(/ [KS]$/, '')}</span>}
+            {!!shots.length && <span className="zoom-hint">нажмите, чтобы увеличить</span>}
           </div>
+          {zoom && (
+            <div className="lightbox" onClick={e => { e.stopPropagation(); setZoom(false) }}>
+              <img src={shots[shot]} alt={p.name} />
+              <button className="x" aria-label="Закрыть">×</button>
+            </div>
+          )}
           {shots.length > 1 && (
             <div className="thumbs">
               {shots.map((src, i) => (
@@ -111,7 +120,8 @@ export default function ProductModal({ p, onClose, onBrand, similar, onOpen, pre
             <a className="add big wa-btn" href={orderLink(p)} target="_blank" rel="noreferrer">
               Заказать в WhatsApp
             </a>
-            <button className={liked ? 'heart-big on' : 'heart-big'} onClick={() => fav.toggle(p.id)}
+            <button className={liked ? 'heart-big on' : 'heart-big'}
+              onClick={() => { fav.toggle(p.id); toast(liked ? 'Убрано из избранного' : '❤️ Добавлено в избранное') }}
               aria-label="В избранное" title={liked ? 'Убрать из избранного' : 'В избранное'}>
               {liked ? '♥' : '♡'}
             </button>

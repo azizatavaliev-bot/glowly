@@ -12,7 +12,7 @@ const SYNONYMS: [RegExp, string[]][] = [
   [/пор[аыу]|чёрн|черн точк/i, ['pore', 'blackhead', 'пор']],
   [/увлажн|сух|обезвож/i, ['moistur', 'hydra', 'aqua', 'увлажн', 'hyaluron']],
   [/морщин|возраст|старен|лифтинг|подтяж/i, ['wrinkle', 'lifting', 'firming', 'collagen', 'peptide', 'морщин']],
-  [/пигмент|пятн|тон|осветл|сиян/i, ['bright', 'whitening', 'glow', 'tone', 'txa', 'vitamin c']],
+  [/пигмент|пятн|\bтон[ауе]?\b|осветл|сиян/i, ['bright', 'whitening', 'glow', 'tone', 'txa', 'vitamin c']],
   [/жирн|блеск|матир/i, ['sebum', 'matte', 'oil control', 'жирн']],
   [/чувствительн|раздражен|краснот|покраснен/i, ['soothing', 'calming', 'cica', 'centella', 'успока']],
   [/солнц|загар|спф|уф/i, ['spf', 'sunscreen', 'солнцезащит', 'uv']],
@@ -87,6 +87,26 @@ export function matches(p: Product, query: string): boolean {
   if (!words.length) return true
   const hay = haystack(p)
   return words.every(w => variants(w).some(v => hay.includes(v)))
+}
+
+/**
+ * Насколько товар соответствует запросу. Прямое совпадение в названии весит
+ * больше, чем срабатывание синонима, — иначе «тонер» выдаёт наборы масок.
+ */
+export function score(p: Product, query: string): number {
+  const words = normalize(query).split(/\s+/).filter(w => w && !STOP.has(w))
+  if (!words.length) return 0
+  const name = `${p.full} ${p.spec ?? ''}`.toLowerCase()
+  let s = 0
+  for (const w of words) {
+    if (name.startsWith(w)) s += 12
+    else if (name.includes(` ${w}`)) s += 8
+    else if (name.includes(w)) s += 5
+    else if (p.brand.toLowerCase().includes(w)) s += 6
+    else s += 1                     // совпало только через синоним
+  }
+  if (p.photos?.length) s += 0.5    // с фото выглядит убедительнее
+  return s
 }
 
 /** Подсказки под строкой поиска — то, что люди спрашивают чаще всего. */

@@ -11,11 +11,12 @@ import { useReveal } from './useReveal'
 import { cover } from './photo'
 import { price, som } from './pricing'
 import { split } from './name'
-import { matches, HINTS } from './search'
+import { matches, score, HINTS } from './search'
 import { NEEDS, hasNeed, countNeed } from './needs'
 import { saving } from './pricing'
 import { useFavorites, useRecent } from './store'
 import FavPanel from './components/FavPanel'
+import Toast from './components/Toast'
 import RoutineBuilder from './components/RoutineBuilder'
 
 const meta = data.meta as Meta
@@ -33,6 +34,7 @@ export default function App() {
   const [sort, setSort] = useState<Sort>('name')
   const [onlySale, setOnlySale] = useState(false)
   const [need, setNeed] = useState('')
+  const [maxPrice, setMaxPrice] = useState(0)   // 0 = без ограничения
   const [limit, setLimit] = useState(48)
   const [open, setOpen] = useState<Product | null>(null)
   const [brandOpen, setBrandOpen] = useState(false)
@@ -57,6 +59,43 @@ export default function App() {
     else url.searchParams.delete('p')
     history.replaceState(null, '', url)
   }, [open])
+
+  // клавиша «/» — быстрый переход в поиск, как в больших магазинах
+  useEffect(() => {
+    const key = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName
+      if (e.key === '/' && tag !== 'INPUT' && tag !== 'TEXTAREA') {
+        e.preventDefault()
+        const el = document.querySelector<HTMLInputElement>('.catalog .search')
+        el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        setTimeout(() => el?.focus(), 400)
+      }
+    }
+    document.addEventListener('keydown', key)
+    return () => document.removeEventListener('keydown', key)
+  }, [])
+
+  // фильтры в адресной строке: ссылку на «все тонеры до 1200 с» можно переслать
+  useEffect(() => {
+    const url = new URL(location.href)
+    const set = (k: string, v: string | number, empty: string | number) =>
+      v === empty ? url.searchParams.delete(k) : url.searchParams.set(k, String(v))
+    set('q', q, '')
+    set('need', need, '')
+    set('brand', brand, 'Все')
+    set('cat', cat, 'Все')
+    set('max', maxPrice, 0)
+    if (!open) history.replaceState(null, '', url)
+  }, [q, need, brand, cat, maxPrice, open])
+
+  useEffect(() => {
+    const sp = new URLSearchParams(location.search)
+    if (sp.get('q')) setQ(sp.get('q')!)
+    if (sp.get('need')) setNeed(sp.get('need')!)
+    if (sp.get('brand')) setBrand(sp.get('brand')!)
+    if (sp.get('cat')) setCat(sp.get('cat')!)
+    if (sp.get('max')) setMaxPrice(Number(sp.get('max')))
+  }, [])
 
   useEffect(() => {
     const on = () => setScrolled(window.scrollY > 40)
@@ -107,16 +146,18 @@ export default function App() {
       if (cat !== 'Все' && p.cat !== cat) return false
       if (brand !== 'Все' && p.brand !== brand) return false
       if (onlySale && !p.sale) return false
+      if (maxPrice && price(p) > maxPrice) return false
       return matches(p, q)
     })
+    if (q.trim() && sort === 'name') return [...r].sort((a, b) => score(b, q) - score(a, q))
     return [...r].sort((a, b) =>
       sort === 'price-asc' ? a.price - b.price :
       sort === 'price-desc' ? b.price - a.price :
       sort === 'save' ? saving(b) - saving(a) :
       a.name.localeCompare(b.name, 'ru'))
-  }, [q, cat, brand, sort, onlySale, need])
+  }, [q, cat, brand, sort, onlySale, need, maxPrice])
 
-  useEffect(() => { setLimit(48) }, [q, cat, brand, sort, onlySale, need])
+  useEffect(() => { setLimit(48) }, [q, cat, brand, sort, onlySale, need, maxPrice])
   useReveal([list, limit])
 
   const toCatalog = () => catalogRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -142,8 +183,10 @@ export default function App() {
         </div>
       </header>
 
-      <Hero total={all.length} brands={brands.length - 1} date={meta.date}
-        columns={columns} onStart={toCatalog} wa={waLink('Здравствуйте! Пишу с сайта GLOWLY — помогите подобрать уход 🙂')} />
+      <Hero all={all} total={all.length} brands={brands.length - 1}
+        columns={columns} onStart={toCatalog} onOpen={setOpen}
+        onSearch={qq => { setQ(qq); setNeed(''); setCat('Все'); setBrand('Все'); toCatalog() }}
+        wa={waLink('Здравствуйте! Пишу с сайта GLOWLY — помогите подобрать уход 🙂')} />
 
       <Marquee items={brands.slice(1)} onPick={pickBrand} />
 
@@ -228,6 +271,12 @@ export default function App() {
               </label>
             </div>
             <div className="hints">
+              <span>Цена до:</span>
+              {[800, 1200, 2000, 3500].map(v => (
+                <button key={v} className={maxPrice === v ? 'hint on' : 'hint'}
+                  onClick={() => setMaxPrice(maxPrice === v ? 0 : v)}>{som(v)}</button>
+              ))}
+              <span className="hint-sep" />
               <span>Часто ищут:</span>
               {HINTS.map(h => (
                 <button key={h} className={q === h ? 'hint on' : 'hint'}
@@ -247,8 +296,8 @@ export default function App() {
         <div className="wrap">
           <div className="found">
             Найдено: <b>{list.length}</b>
-            {(brand !== 'Все' || cat !== 'Все' || onlySale || q || need) && (
-              <button className="link" onClick={() => { setBrand('Все'); setCat('Все'); setOnlySale(false); setQ(''); setNeed('') }}>
+            {(brand !== 'Все' || cat !== 'Все' || onlySale || q || need || maxPrice > 0) && (
+              <button className="link" onClick={() => { setBrand('Все'); setCat('Все'); setOnlySale(false); setQ(''); setNeed(''); setMaxPrice(0) }}>
                 сбросить фильтры
               </button>
             )}
@@ -368,6 +417,8 @@ export default function App() {
           onClose={() => setBrandOpen(false)}
         />
       )}
+
+      <Toast />
 
       <a className="fab wa-fab" href={waLink('Здравствуйте! Пишу с сайта GLOWLY — есть вопрос 🙂')}
         target="_blank" rel="noreferrer">

@@ -5,6 +5,7 @@ import { split } from '../name'
 import { orderLink } from './ProductModal'
 import videos from '../data/videos.json'
 import { useFavorites } from '../store'
+import { toast } from './Toast'
 
 type Props = {
   p: Product
@@ -35,7 +36,7 @@ export default function Card({ p, delay, onOpen }: Props) {
           {hasVideo && <span className="tag-mini video">▶ обзор</span>}
         </div>
         <button className={liked ? 'heart on' : 'heart'} aria-label="В избранное"
-          onClick={e => { e.stopPropagation(); fav.toggle(p.id) }}>
+          onClick={e => { e.stopPropagation(); fav.toggle(p.id); toast(liked ? 'Убрано из избранного' : '❤️ Добавлено в избранное') }}>
           {liked ? '♥' : '♡'}
         </button>
         <span className="peek">подробнее</span>
