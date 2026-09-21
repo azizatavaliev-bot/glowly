@@ -3,8 +3,9 @@
 Розничная витрина корейской косметики для покупателей из Бишкека, собрана из Excel-прайса склада.
 Все действия ведут в WhatsApp: корзины и оформления заказа на сайте нет.
 
-**Название магазина — GLOWLY** (с 20.09.2026). Папка проекта, репозиторий и прод-URL
-пока остались korshop-catalog — переименовывать по отдельной просьбе.
+**Название магазина — GLOWLY** (с 20.09.2026). Репозиторий — `azizatavaliev-bot/glowly`,
+прод — `/glowly/`. Локальная папка осталась `korshop-catalog`: на её `node_modules` симлинком
+завязан соседний KorProfit, переименование папки его сломает.
 korshop.one — сайт склада-поставщика, в футере клиентской витрины его нет.
 
 ## Стек
@@ -12,11 +13,11 @@ Vite 5 + React 18 + TypeScript, без бэкенда. Данные — стат
 
 ## Ссылки
 - local: http://localhost:5280
-- prod: https://azizatavaliev-bot.github.io/korshop-catalog/ (GitHub Pages, ветка gh-pages)
+- prod: https://azizatavaliev-bot.github.io/glowly/ (GitHub Pages, ветка gh-pages)
 
 ## Деплой
 ```bash
-npm run build:pages                 # сборка с base=/korshop-catalog/
+npm run build:pages                 # сборка с base=/glowly/
 npx gh-pages -d dist -b gh-pages    # публикация
 ```
 Railway-токен из Keychain мёртв (Unauthorized) — деплой идёт через GitHub Pages

@@ -1,5 +1,5 @@
 import { chromium } from 'playwright'
-const URL = 'https://azizatavaliev-bot.github.io/korshop-catalog/'
+const URL = 'https://azizatavaliev-bot.github.io/glowly/'
 const b = await chromium.launch()
 const p = await b.newPage({ viewport: { width: 1440, height: 950 } })
 const errs = []
