@@ -102,9 +102,9 @@ h1, h2, h3 { letter-spacing: -.025em; }
 .swap em {
   position: absolute; left: 0; top: 0; font-family: "Playfair Display", Georgia, serif;
   font-style: italic; font-weight: 400; color: var(--acc); white-space: nowrap;
-  opacity: 0; transform: translateY(14px); transition: opacity .5s var(--ease), transform .5s var(--ease);
+  opacity: 0; transform: translateY(14px); transition: opacity .25s var(--ease), transform .45s var(--ease);
 }
-.swap em.on { opacity: 1; transform: none; }
+.swap em.on { opacity: 1; transform: none; z-index: 2; transition: opacity .55s var(--ease) .1s, transform .55s var(--ease); }
 .hero p { margin: 0 0 22px; color: var(--mut); max-width: 460px; font-size: 16.5px; animation: up .9s .14s var(--ease) both; }
 
 /* поиск прямо на первом экране */
@@ -797,4 +797,35 @@ a.cart-btn { text-decoration: none; }
 @media (max-width: 720px) {
   .toast { bottom: 84px; font-size: 13px; padding: 11px 18px; }
   .zoom-hint { display: none; }
+}
+
+
+/* ── узкие телефоны: 360–420 px ──────────────────────────────────── */
+@media (max-width: 430px) {
+  /* «Написать в WhatsApp» в две строки ломало шапку */
+  .top .cart-btn { font-size: 0; padding: 10px 14px; }
+  .top .cart-btn::after { content: 'WhatsApp'; font-size: 13px; }
+  .hero { padding: 92px 0 40px; }
+  .hero h1 { font-size: 30px; }
+  .hero p { font-size: 15px; margin-bottom: 18px; }
+  /* кнопки первого экрана — в столбик, на всю ширину */
+  .hero-cta { flex-direction: column; }
+  .hero-cta .btn-main, .hero-cta .btn-ghost { width: 100%; text-align: center; padding: 15px 20px; }
+  .stats { gap: 10px; }
+  .stats dt { font-size: 19px; }
+  .stats dd { font-size: 10.5px; }
+  /* плавающая кнопка не должна закрывать пол-экрана */
+  .wa-fab { font-size: 0; padding: 14px; border-radius: 50%; width: 54px; height: 54px; justify-content: center; }
+  .wa-fab::before { content: '💬'; font-size: 22px; }
+  .to-top { bottom: 78px; }
+  .toast { bottom: 78px; }
+}
+
+/* порядок в карточке товара на телефоне: фото → название и цена → характеристики */
+@media (max-width: 720px) {
+  .m-left { display: contents; }
+  .modal .m-pic { order: 1; margin: 16px 16px 0; border-radius: 16px; }
+  .modal .thumbs { order: 2; padding: 10px 16px 0; }
+  .modal .m-body { order: 3; }
+  .modal .m-facts { order: 4; margin: 0 16px 20px; }
 }
