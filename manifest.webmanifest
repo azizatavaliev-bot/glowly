@@ -1,0 +1,13 @@
+{
+  "name": "GLOWLY — корейская косметика",
+  "short_name": "GLOWLY",
+  "description": "Корейская косметика в Бишкеке по ценам ниже магазинов",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fbf8f5",
+  "theme_color": "#16130f",
+  "lang": "ru",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
