@@ -642,3 +642,89 @@ a.cart-btn { text-decoration: none; }
   .hints::-webkit-scrollbar { display: none; }
   .hints > span, .hint { flex: 0 0 auto; white-space: nowrap; }
 }
+
+/* ── фишки: избранное, бейджи, конструктор ухода, наверх ────────── */
+.fav-btn { position: relative; border: 1px solid var(--line); background: #fff; width: 40px; height: 40px; border-radius: 11px; font-size: 18px; color: var(--acc); transition: .2s; }
+.fav-btn:hover { border-color: var(--acc); }
+.fav-btn b { position: absolute; top: -7px; right: -7px; background: var(--ink); color: #fff; font-size: 10.5px; padding: 1px 6px; border-radius: 20px; }
+
+.heart { position: absolute; right: 10px; top: 10px; z-index: 3; width: 34px; height: 34px; border-radius: 50%; border: 0;
+  background: rgba(255,255,255,.92); backdrop-filter: blur(4px); color: #b8afa6; font-size: 19px; line-height: 1; transition: .2s var(--ease); }
+.heart:hover { color: var(--acc); transform: scale(1.1); }
+.heart.on { color: var(--acc); animation: pop .35s var(--ease); }
+@keyframes pop { 40% { transform: scale(1.35); } }
+
+.tags-tl { position: absolute; left: 10px; bottom: 10px; display: flex; gap: 5px; z-index: 2; }
+.card .badge ~ .tags-tl { bottom: 10px; }
+.tag-mini { background: rgba(255,255,255,.92); backdrop-filter: blur(4px); color: var(--acc); font-size: 10.5px; font-weight: 700; padding: 4px 8px; border-radius: 20px; }
+.tag-mini.video { color: #c4302b; }
+.card .shots { right: 10px; bottom: 10px; }
+.card .peek { bottom: 46px; }
+
+.m-cta { display: flex; gap: 8px; align-items: stretch; }
+.m-cta .add.big { flex: 1; }
+.heart-big, .share-big { width: 54px; border: 1px solid var(--line); background: #fff; border-radius: 12px; font-size: 22px; color: #b8afa6; transition: .2s var(--ease); }
+.heart-big:hover, .share-big:hover { border-color: var(--ink); color: var(--ink); }
+.heart-big.on { color: var(--acc); border-color: var(--acc); background: var(--acc-soft); }
+
+.cart-head h2 small { font-size: 12px; font-weight: 600; color: #fff; background: var(--acc); padding: 2px 8px; border-radius: 20px; margin-left: 6px; vertical-align: middle; }
+.ci img, .ci-b { cursor: pointer; }
+.ci-x { border: 0; background: #f1ece6; width: 28px; height: 28px; border-radius: 50%; color: var(--mut); font-size: 17px; line-height: 1; }
+.ci-x:hover { background: var(--acc); color: #fff; }
+
+.recent { padding: 50px 0 0; }
+
+.to-top { position: fixed; right: 22px; bottom: 90px; z-index: 44; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line);
+  background: #fff; color: var(--ink); font-size: 18px; box-shadow: 0 6px 20px rgba(22,19,15,.12); animation: up .3s var(--ease) both; }
+.to-top:hover { background: var(--ink); color: #fff; }
+
+/* конструктор ухода */
+.routine { padding: 60px 0 20px; }
+.routine-head p { margin: -6px 0 22px; color: var(--mut); max-width: 560px; }
+.rb-q { margin-bottom: 18px; transition: opacity .3s; }
+.rb-q.dim { opacity: .4; pointer-events: none; }
+.rb-label { font-weight: 700; font-size: 14.5px; margin-bottom: 10px; }
+.rb-opts { display: flex; gap: 8px; flex-wrap: wrap; }
+.rb-opt { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: #fff; border-radius: 22px; padding: 10px 16px; font-size: 13.5px; font-weight: 600; transition: .2s var(--ease); }
+.rb-opt span { font-size: 17px; }
+.rb-opt:hover { border-color: var(--ink); transform: translateY(-2px); }
+.rb-opt.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+.rb-result { margin-top: 26px; animation: up .5s var(--ease) both; }
+.rb-steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.rb-step { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+.rb-step-h { font-size: 12px; font-weight: 700; color: var(--mut); display: flex; align-items: center; gap: 6px; }
+.rb-step-h span { font-size: 16px; }
+.rb-pic { border: 0; background: #f4f1ec; border-radius: 12px; aspect-ratio: 1; padding: 10px; cursor: pointer; overflow: hidden; }
+.rb-pic img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; transition: transform .4s var(--ease); }
+.rb-pic:hover img { transform: scale(1.06); }
+.rb-brand { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--mut); font-weight: 700; margin-top: 4px; }
+.rb-name { font-size: 13px; font-weight: 600; line-height: 1.3; cursor: pointer; }
+.rb-name:hover { color: var(--acc); }
+.rb-sub { font-size: 10.5px; color: var(--mut); line-height: 1.3; flex: 1; }
+.rb-row { display: flex; justify-content: space-between; align-items: center; padding-top: 8px; }
+.rb-row b { font-size: 15px; }
+.rb-swap { border: 0; background: none; color: var(--mut); font-size: 11.5px; cursor: pointer; }
+.rb-swap:hover { color: var(--acc); }
+.rb-none { color: var(--mut); font-size: 12.5px; padding: 20px 0; }
+.rb-total { margin-top: 16px; background: var(--ink); color: #fff; border-radius: 18px; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+.rb-total > div { display: flex; flex-direction: column; }
+.rb-total span { font-size: 12px; color: rgba(255,255,255,.6); }
+.rb-total b { font-size: 30px; letter-spacing: -.02em; }
+.rb-total i { font-style: normal; font-size: 12px; color: rgba(255,255,255,.6); }
+.rb-total .add.big { width: auto; padding: 15px 28px; }
+
+@media (max-width: 980px) { .rb-steps { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 720px) {
+  .routine { padding: 40px 0 10px; }
+  .rb-steps { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .rb-step { padding: 10px; }
+  .rb-opt { padding: 9px 13px; font-size: 13px; }
+  .rb-total { padding: 16px; }
+  .rb-total .add.big { width: 100%; }
+  .to-top { right: 14px; bottom: 82px; width: 40px; height: 40px; }
+  /* на телефоне: кнопка заказа на всю ширину, сердечко и «поделиться» — второй строкой пополам */
+  .m-cta { flex-wrap: wrap; }
+  .m-cta .add.big { flex: 1 1 100%; }
+  .heart-big, .share-big { flex: 1 1 calc(50% - 4px); width: auto; height: 46px; }
+  .fav-btn { width: 36px; height: 36px; }
+}

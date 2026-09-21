@@ -5,6 +5,7 @@ import { photos } from '../photo'
 import { price, cityPrice, saving, som } from '../pricing'
 import { split, full } from '../name'
 import videos from '../data/videos.json'
+import { useFavorites, useRecent } from '../store'
 
 type Props = {
   p: Product
@@ -32,8 +33,19 @@ export default function ProductModal({ p, onClose, onBrand, similar, onOpen, pre
   const how = steps(p)
   const clip = (videos as Record<string, Video[]>)[String(p.id)]?.[0]
   const save = saving(p)
+  const fav = useFavorites()
+  const recent = useRecent()
+  const liked = fav.has(p.id)
 
-  useEffect(() => { setShot(0) }, [p.id])
+  useEffect(() => { setShot(0); recent.push(p.id) }, [p.id])  // eslint-disable-line react-hooks/exhaustive-deps
+
+  // на телефоне — системное «Поделиться», на компьютере — копируем ссылку
+  const share = async () => {
+    const url = `${location.origin}${location.pathname}?p=${p.id}`
+    const data = { title: `${split(p).title} — GLOWLY`, text: `${full(p)} · ${som(price(p))}`, url }
+    if (navigator.share) { try { await navigator.share(data) } catch { /* отменили */ } }
+    else { await navigator.clipboard.writeText(url); alert('Ссылка скопирована') }
+  }
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -95,9 +107,20 @@ export default function ProductModal({ p, onClose, onBrand, similar, onOpen, pre
             )}
           </div>
 
-          <a className="add big wa-btn" href={orderLink(p)} target="_blank" rel="noreferrer">
-            Заказать в WhatsApp
-          </a>
+          <div className="m-cta">
+            <a className="add big wa-btn" href={orderLink(p)} target="_blank" rel="noreferrer">
+              Заказать в WhatsApp
+            </a>
+            <button className={liked ? 'heart-big on' : 'heart-big'} onClick={() => fav.toggle(p.id)}
+              aria-label="В избранное" title={liked ? 'Убрать из избранного' : 'В избранное'}>
+              {liked ? '♥' : '♡'}
+            </button>
+            <button className="share-big" onClick={share} aria-label="Поделиться" title="Поделиться">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7" /><path d="M16 6l-4-4-4 4" /><path d="M12 2v13" />
+              </svg>
+            </button>
+          </div>
           <div className="pay-note">Ответим в течение дня · доставка по Бишкеку · оплата при получении</div>
 
           <p className="what">{summary(p)}</p>

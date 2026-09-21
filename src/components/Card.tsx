@@ -3,6 +3,8 @@ import { cover, photos } from '../photo'
 import { price, cityPrice, saving, som } from '../pricing'
 import { split } from '../name'
 import { orderLink } from './ProductModal'
+import videos from '../data/videos.json'
+import { useFavorites } from '../store'
 
 type Props = {
   p: Product
@@ -15,6 +17,10 @@ export default function Card({ p, delay, onOpen }: Props) {
   const shots = photos(p).length
   const save = saving(p)
   const { title, sub } = split(p)
+  const fav = useFavorites()
+  const liked = fav.has(p.id)
+  const hasVideo = !!(videos as Record<string, unknown>)[String(p.id)]
+  const bigSave = save >= 150
 
   return (
     <article className="card" data-reveal style={{ transitionDelay: `${delay * 28}ms` }}>
@@ -24,6 +30,14 @@ export default function Card({ p, delay, onOpen }: Props) {
           : <div className="noimg">нет фото</div>}
         {p.sale && <span className="badge">{p.sale.replace('АКЦИЯ ', '−').replace(/ [KS]$/, '')}</span>}
         {shots > 1 && <span className="shots">{shots} фото</span>}
+        <div className="tags-tl">
+          {bigSave && !p.sale && <span className="tag-mini">Выгодно</span>}
+          {hasVideo && <span className="tag-mini video">▶ обзор</span>}
+        </div>
+        <button className={liked ? 'heart on' : 'heart'} aria-label="В избранное"
+          onClick={e => { e.stopPropagation(); fav.toggle(p.id) }}>
+          {liked ? '♥' : '♡'}
+        </button>
         <span className="peek">подробнее</span>
       </div>
       <div className="body">

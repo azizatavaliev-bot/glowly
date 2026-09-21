@@ -13,6 +13,10 @@ import { price, som } from './pricing'
 import { split } from './name'
 import { matches, HINTS } from './search'
 import { NEEDS, hasNeed, countNeed } from './needs'
+import { saving } from './pricing'
+import { useFavorites, useRecent } from './store'
+import FavPanel from './components/FavPanel'
+import RoutineBuilder from './components/RoutineBuilder'
 
 const meta = data.meta as Meta
 const all = data.products as Product[]
@@ -20,7 +24,7 @@ const all = data.products as Product[]
 const WA = '996559050618'
 const waLink = (text: string) => `https://wa.me/${WA}?text=${encodeURIComponent(text)}`
 
-type Sort = 'name' | 'price-asc' | 'price-desc'
+type Sort = 'name' | 'price-asc' | 'price-desc' | 'save'
 
 export default function App() {
   const [q, setQ] = useState('')
@@ -32,6 +36,11 @@ export default function App() {
   const [limit, setLimit] = useState(48)
   const [open, setOpen] = useState<Product | null>(null)
   const [brandOpen, setBrandOpen] = useState(false)
+  const [favOpen, setFavOpen] = useState(false)
+  const fav = useFavorites()
+  const recent = useRecent()
+  const favItems = fav.ids.map(id => all.find(p => p.id === id)).filter((p): p is Product => !!p)
+  const recentItems = recent.ids.map(id => all.find(p => p.id === id)).filter((p): p is Product => !!p)
   const [scrolled, setScrolled] = useState(false)
   const catalogRef = useRef<HTMLDivElement>(null)
 
@@ -57,8 +66,8 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    document.body.classList.toggle('locked', !!open || brandOpen)
-  }, [open, brandOpen])
+    document.body.classList.toggle('locked', !!open || brandOpen || favOpen)
+  }, [open, brandOpen, favOpen])
 
   const cats = useMemo(() => {
     const c = new Map<string, number>()
@@ -103,6 +112,7 @@ export default function App() {
     return [...r].sort((a, b) =>
       sort === 'price-asc' ? a.price - b.price :
       sort === 'price-desc' ? b.price - a.price :
+      sort === 'save' ? saving(b) - saving(a) :
       a.name.localeCompare(b.name, 'ru'))
   }, [q, cat, brand, sort, onlySale, need])
 
@@ -121,6 +131,9 @@ export default function App() {
           </button>
           <div className="top-right">
             <span className="city">Бишкек</span>
+            <button className="fav-btn" onClick={() => setFavOpen(true)} aria-label="Избранное">
+              ♥{fav.ids.length > 0 && <b>{fav.ids.length}</b>}
+            </button>
             <a className="cart-btn" href={waLink('Здравствуйте! Пишу с сайта GLOWLY — хочу спросить про косметику 🙂')}
               target="_blank" rel="noreferrer">
               Написать в WhatsApp
@@ -182,6 +195,8 @@ export default function App() {
         </div>
       </section>
 
+      <RoutineBuilder all={all} onOpen={setOpen} wa={waLink} />
+
       <div className="catalog" ref={catalogRef} id="catalog">
         <div className="wrap">
           <h2 className="sec-title" data-reveal>
@@ -205,6 +220,7 @@ export default function App() {
                 { value: 'name', label: 'По названию' },
                 { value: 'price-asc', label: 'Сначала дешёвые' },
                 { value: 'price-desc', label: 'Сначала дорогие' },
+                { value: 'save', label: 'Самая большая выгода' },
               ]} />
               <label className="chk">
                 <input type="checkbox" checked={onlySale} onChange={e => setOnlySale(e.target.checked)} />
@@ -260,6 +276,24 @@ export default function App() {
         </div>
       </div>
 
+      {recentItems.length > 1 && (
+        <section className="recent">
+          <div className="wrap sales-head">
+            <h2>Вы смотрели</h2>
+          </div>
+          <div className="rail">
+            {recentItems.map(p => (
+              <button className="sale-card" key={p.id} onClick={() => setOpen(p)}>
+                <img src={cover(p) ?? ''} alt="" loading="lazy" />
+                <b>{p.brand}</b>
+                <i>{split(p).title}</i>
+                <u>{som(price(p))}</u>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
       <section className="how" data-reveal>
         <div className="wrap">
           <h2 className="sec-title">Как заказать</h2>
@@ -313,6 +347,16 @@ export default function App() {
           prev={list[list.findIndex(x => x.id === open.id) - 1] ?? null}
           next={list[list.findIndex(x => x.id === open.id) + 1] ?? null}
         />
+      )}
+
+      {favOpen && (
+        <FavPanel items={favItems} wa={waLink}
+          onOpen={p => { setFavOpen(false); setOpen(p) }}
+          onRemove={fav.toggle} onClear={fav.clear} onClose={() => setFavOpen(false)} />
+      )}
+
+      {scrolled && (
+        <button className="to-top" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="Наверх">↑</button>
       )}
 
       {brandOpen && (
