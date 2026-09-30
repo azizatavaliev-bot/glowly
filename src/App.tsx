@@ -9,7 +9,7 @@ import BrandPicker from './components/BrandPicker'
 import Dropdown from './components/Dropdown'
 import { useReveal } from './useReveal'
 import { cover } from './photo'
-import { price, som } from './pricing'
+import { price, som, TOP } from './pricing'
 import { split } from './name'
 import { matches, score, HINTS } from './search'
 import { NEEDS, hasNeed, countNeed } from './needs'
@@ -122,6 +122,12 @@ export default function App() {
     return c
   }, [])
 
+  // топ-15 от владельца, в его порядке
+  const topList = useMemo(() =>
+    Object.entries(TOP).map(([id, t]) => ({ p: all.find(p => p.id === Number(id)), rank: t.rank }))
+      .filter((x): x is { p: Product; rank: number } => !!x.p)
+      .sort((a, b) => a.rank - b.rank), [])
+
   // в ленту акций — по одному товару на бренд, сначала самая большая скидка
   const sales = useMemo(() => {
     const pct = (p: Product) => Number(p.sale?.match(/(\d+)%/)?.[1] ?? 0)
@@ -191,7 +197,7 @@ export default function App() {
       </header>
 
       <Hero all={all} total={all.length} brands={brands.length - 1}
-        columns={columns} onStart={toCatalog} onOpen={setOpen}
+        columns={columns} hits={topList.map(t => t.p)} onStart={toCatalog} onOpen={setOpen}
         onSearch={qq => { setQ(qq); setNeed(''); setCat('Все'); setBrand('Все'); toCatalog() }}
         wa={waLink('Здравствуйте! Пишу с сайта GLOWLY — помогите подобрать уход 🙂')} />
 
@@ -203,6 +209,26 @@ export default function App() {
           <div><b>💸 Дешевле города</b><span>Цены ниже магазинных — сравнение в каждой карточке</span></div>
           <div><b>🚚 Доставка по Бишкеку</b><span>Привезём день в день, оплата при получении</span></div>
           <div><b>💬 Подберём уход</b><span>Напишите в WhatsApp — поможем выбрать под вашу кожу</span></div>
+        </div>
+      </section>
+
+      <section className="sales top15" data-reveal id="top">
+        <div className="wrap sales-head">
+          <h2>🔥 Топ-15 — берут чаще всего</h2>
+          <button className="link" onClick={() => { setSort('name'); setQ(''); setNeed(''); setCat('Все'); setBrand('Все'); toCatalog() }}>
+            весь каталог →
+          </button>
+        </div>
+        <div className="rail">
+          {topList.map(({ p, rank }) => (
+            <button className="sale-card" key={p.id} onClick={() => setOpen(p)}>
+              <img src={cover(p) ?? ''} alt="" loading="lazy" />
+              <span className="badge rank">{rank}</span>
+              <b>{p.brand}</b>
+              <i>{split(p).title} {split(p).sub}</i>
+              <u>{som(price(p))}</u>
+            </button>
+          ))}
         </div>
       </section>
 

@@ -10,6 +10,7 @@ type Props = {
   total: number
   brands: number
   columns: Product[][]
+  hits: Product[]
   onStart: () => void
   onSearch: (q: string) => void
   onOpen: (p: Product) => void
@@ -36,7 +37,7 @@ function useCountUp(target: number, ms = 1100): number {
   return v
 }
 
-export default function Hero({ all, total, brands, columns, onStart, onSearch, onOpen, wa }: Props) {
+export default function Hero({ all, total, brands, columns, hits: topHits, onStart, onSearch, onOpen, wa }: Props) {
   const [word, setWord] = useState(0)
   const [q, setQ] = useState('')
   const [focus, setFocus] = useState(false)
@@ -136,9 +137,9 @@ export default function Hero({ all, total, brands, columns, onStart, onSearch, o
         </div>
 
         <div className="hero-rail">
-          <div className="hero-rail-h">Хиты продаж</div>
+          <div className="hero-rail-h">🔥 Топ-15 — берут чаще всего</div>
           <div className="rail">
-            {columns.flat().slice(0, 12).map(p => (
+            {topHits.map(p => (
               <button className="sale-card" key={p.id} onClick={() => onOpen(p)}>
                 <img src={cover(p) ?? ''} alt="" loading="lazy" />
                 <b>{p.brand}</b>

@@ -929,3 +929,15 @@ a.cart-btn { text-decoration: none; }
   .hero-rail .sale-card { flex: 0 0 122px; }
   .mbar button, .mbar a { font-size: 10px; }
 }
+
+
+/* ── топ-15 ─────────────────────────────────────────────────────── */
+.top15 { padding-top: 56px; }
+.badge.rank { left: auto; right: 10px; top: 10px; background: var(--ink); min-width: 26px; text-align: center; border-radius: 50%; padding: 5px 0; font-size: 12px; }
+.tag-mini.top { background: var(--ink); color: #fff; }
+.top15 .sale-card { flex: 0 0 210px; }
+.top15 .sale-card i { height: 44px; -webkit-line-clamp: 3; }
+@media (max-width: 720px) {
+  .top15 { padding-top: 30px; }
+  .top15 .sale-card { flex: 0 0 150px; }
+}
