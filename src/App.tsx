@@ -321,8 +321,8 @@ export default function App() {
           </div>
 
           <div className="grid">
-            {list.slice(0, limit).map((p, i) => (
-              <Card key={p.id} p={p} delay={i % 12} onOpen={() => setOpen(p)} />
+            {list.slice(0, limit).map(p => (
+              <Card key={p.id} p={p} onOpen={() => setOpen(p)} />
             ))}
           </div>
 

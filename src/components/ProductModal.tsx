@@ -5,6 +5,7 @@ import { photos } from '../photo'
 import { price, cityPrice, saving, som, inStock, ORDER_DAYS } from '../pricing'
 import { split, full } from '../name'
 import videos from '../data/videos.json'
+import details from '../data/details.json'
 import { useFavorites, useRecent } from '../store'
 import { toast } from './Toast'
 
@@ -31,9 +32,11 @@ export default function ProductModal({ p, onClose, onBrand, similar, onOpen, pre
   const [zoom, setZoom] = useState(false)
   const v = volume(p)
   const shots = photos(p)
-  const good = benefits(p)
-  const who = forWhom(p)
-  const how = steps(p)
+  type Detail = { about: string; benefits: string[]; for: string[]; howto: string[]; actives: { label: string; text: string }[]; tip?: string }
+  const d = (details as Record<string, Detail>)[String(p.id)]
+  const good = d?.benefits ?? benefits(p)
+  const who = d?.for ?? forWhom(p)
+  const how = d?.howto ?? steps(p)
   const clip = (videos as Record<string, Video[]>)[String(p.id)]?.[0]
   const save = saving(p)
   const fav = useFavorites()
@@ -136,7 +139,7 @@ export default function ProductModal({ p, onClose, onBrand, similar, onOpen, pre
             ? <div className="stock-line in">● В наличии · доставка по Бишкеку сегодня-завтра · оплата при получении</div>
             : <div className="stock-line">○ Под заказ со склада · {ORDER_DAYS} · предоплата не нужна</div>}
 
-          <p className="what">{summary(p)}</p>
+          <p className="what">{d?.about ?? summary(p)}</p>
 
           <section className="sec">
             <div className="sec-h">Чем полезен</div>
@@ -158,6 +161,19 @@ export default function ProductModal({ p, onClose, onBrand, similar, onOpen, pre
               {how.map(st => <li key={st}>{st}</li>)}
             </ol>
           </section>
+
+          {d?.actives && (
+            <section className="sec">
+              <div className="sec-h">Что внутри</div>
+              <div className="acts">
+                {d.actives.map(a => (
+                  <div className="act" key={a.label}><b>{a.label}</b><span>{a.text}</span></div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {d?.tip && <div className="tip">💡 {d.tip}</div>}
 
           {clip && (
             <section className="sec">

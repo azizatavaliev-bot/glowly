@@ -8,11 +8,10 @@ import { toast } from './Toast'
 
 type Props = {
   p: Product
-  delay: number
   onOpen: () => void
 }
 
-export default function Card({ p, delay, onOpen }: Props) {
+export default function Card({ p, onOpen }: Props) {
   const pic = cover(p)
   const save = saving(p)
   const { title, sub } = split(p)
@@ -21,7 +20,7 @@ export default function Card({ p, delay, onOpen }: Props) {
   const stock = inStock(p)
 
   return (
-    <article className="card" data-reveal style={{ transitionDelay: `${delay * 28}ms` }}>
+    <article className="card">
       <div className="pic" onClick={onOpen}>
         {pic
           ? <img src={pic} alt={p.name} loading="lazy" />
