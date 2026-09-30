@@ -1,9 +1,8 @@
 import type { Product } from '../types'
-import { cover, photos } from '../photo'
+import { cover } from '../photo'
 import { price, cityPrice, saving, som, inStock } from '../pricing'
 import { split } from '../name'
 import { orderLink } from './ProductModal'
-import videos from '../data/videos.json'
 import { useFavorites } from '../store'
 import { toast } from './Toast'
 
@@ -15,13 +14,10 @@ type Props = {
 
 export default function Card({ p, delay, onOpen }: Props) {
   const pic = cover(p)
-  const shots = photos(p).length
   const save = saving(p)
   const { title, sub } = split(p)
   const fav = useFavorites()
   const liked = fav.has(p.id)
-  const hasVideo = !!(videos as Record<string, unknown>)[String(p.id)]
-  const bigSave = save >= 150
   const stock = inStock(p)
 
   return (
@@ -31,11 +27,6 @@ export default function Card({ p, delay, onOpen }: Props) {
           ? <img src={pic} alt={p.name} loading="lazy" />
           : <div className="noimg">нет фото</div>}
         {p.sale && <span className="badge">{p.sale.replace('АКЦИЯ ', '−').replace(/ [KS]$/, '')}</span>}
-        {shots > 1 && <span className="shots">{shots} фото</span>}
-        <div className="tags-tl">
-          {bigSave && !p.sale && <span className="tag-mini">Выгодно</span>}
-          {hasVideo && <span className="tag-mini video">▶ обзор</span>}
-        </div>
         <button className={liked ? 'heart on' : 'heart'} aria-label="В избранное"
           onClick={e => { e.stopPropagation(); fav.toggle(p.id); toast(liked ? 'Убрано из избранного' : '❤️ Добавлено в избранное') }}>
           {liked ? '♥' : '♡'}
