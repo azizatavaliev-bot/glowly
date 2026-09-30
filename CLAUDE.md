@@ -18,8 +18,14 @@ Vite 5 + React 18 + TypeScript, без бэкенда. Данные — стат
 
 ## Деплой (Railway, с 01.10.2026)
 Сервис собирается из GitHub-репо `azizatavaliev-bot/glowly` по Dockerfile (node build → nginx).
-**Автодеплой при push в main.** Если не подхватилось — толкнуть руками через GraphQL:
-`mutation { serviceInstanceDeployV2(serviceId:"b82fe2d0-8bac-41df-be4a-25520735fe7b", environmentId:"d3e45f71-8d12-4386-b3ae-f2aaf3a382fb") }`
+**Автодеплой по push НЕ работает** (сервис создан через API, GitHub-триггер не подключён).
+`serviceInstanceDeployV2` пересобирает ТОТ ЖЕ старый коммит — бесполезно. Деплоить надо так:
+```bash
+SHA=$(git rev-parse HEAD)
+mutation { serviceInstanceDeploy(serviceId:"b82fe2d0-8bac-41df-be4a-25520735fe7b",
+           environmentId:"d3e45f71-8d12-4386-b3ae-f2aaf3a382fb", commitSha:"$SHA") }
+```
+Проверять после деплоя: имя файла `assets/index-*.js` на проде должно совпасть с локальным `dist/`.
 с заголовком `Authorization: Bearer $(security find-generic-password -a claude-workspace -s railway-token -w)`.
 Project id `4bdaa2dc-bd4d-4ca9-8d51-4d7c6e5cba20`.
 
