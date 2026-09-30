@@ -1,0 +1,17 @@
+import { chromium } from 'playwright'
+const URL = process.env.URL || 'http://localhost:5280/'
+const b = await chromium.launch()
+const m = await b.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true })
+const errs = []; m.on('pageerror', e => errs.push(e.message.slice(0, 100)))
+await m.goto(URL, { waitUntil: 'networkidle' }); await m.waitForTimeout(1200)
+await m.screenshot({ path: '/tmp/a1.png' })
+await m.evaluate(() => document.querySelector('#catalog').scrollIntoView()); await m.waitForTimeout(700)
+await m.screenshot({ path: '/tmp/a2.png' })
+await m.locator('.mbar button').nth(1).click(); await m.waitForTimeout(1200)
+await m.locator('.rb-opt').nth(3).click(); await m.locator('.rb-opt').nth(5).click(); await m.waitForTimeout(800)
+await m.screenshot({ path: '/tmp/a3.png' })
+await m.locator('.card .heart').first().click().catch(() => {})
+await m.locator('.mbar button').nth(2).click(); await m.waitForTimeout(700)
+await m.screenshot({ path: '/tmp/a4.png' })
+console.log('ошибки:', errs.length ? errs : 'нет')
+await b.close()

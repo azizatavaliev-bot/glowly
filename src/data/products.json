@@ -630,7 +630,12 @@
    "img": "a455514576f9.webp",
    "cat": "Уход за лицом",
    "sale": null,
-   "exp": null
+   "exp": null,
+   "photos": [
+    "0032_n1.webp",
+    "0032_n2.webp",
+    "0032_n3.webp"
+   ]
   },
   {
    "id": 33,
@@ -646,7 +651,12 @@
    "img": "2d0ff068b622.webp",
    "cat": "Уход за лицом",
    "sale": null,
-   "exp": null
+   "exp": null,
+   "photos": [
+    "0033_n1.webp",
+    "0033_n2.webp",
+    "0033_n3.webp"
+   ]
   },
   {
    "id": 34,
@@ -1235,7 +1245,7 @@
    "photos": [
     "0064_1.webp",
     "0064_3.webp",
-    "0064_2.webp"
+    "0064_n1.webp"
    ]
   },
   {
@@ -1982,7 +1992,8 @@
    "sale": null,
    "exp": null,
    "photos": [
-    "0102_2.webp"
+    "0102_2.webp",
+    "0102_n1.webp"
    ]
   },
   {
@@ -2177,7 +2188,12 @@
    "img": "8a1395ba88a0.webp",
    "cat": "Уход за лицом",
    "sale": null,
-   "exp": null
+   "exp": null,
+   "photos": [
+    "0112_n1.webp",
+    "0112_n2.webp",
+    "0112_n3.webp"
+   ]
   },
   {
    "id": 113,
@@ -3300,9 +3316,9 @@
    "sale": null,
    "exp": null,
    "photos": [
-    "0173_3.webp",
-    "0173_2.webp",
-    "0173_1.webp"
+    "0173_1.webp",
+    "0173_n1.webp",
+    "0173_n2.webp"
    ]
   },
   {
@@ -6365,8 +6381,8 @@
    "exp": null,
    "photos": [
     "0334_1.webp",
-    "0334_2.webp",
-    "0334_3.webp"
+    "0334_n1.webp",
+    "0334_n2.webp"
    ]
   },
   {
@@ -8130,8 +8146,8 @@
    "exp": null,
    "photos": [
     "0427_3.webp",
-    "0427_2.webp",
-    "0427_1.webp"
+    "0427_n1.webp",
+    "0427_n2.webp"
    ]
   },
   {
@@ -8383,7 +8399,12 @@
    "img": "0efa1b317673.webp",
    "cat": "Уход за лицом",
    "sale": null,
-   "exp": null
+   "exp": null,
+   "photos": [
+    "0440_n1.webp",
+    "0440_n2.webp",
+    "0440_n3.webp"
+   ]
   },
   {
    "id": 441,
@@ -9066,7 +9087,9 @@
    "sale": null,
    "exp": null,
    "photos": [
-    "0475_1.webp"
+    "0475_1.webp",
+    "0475_n1.webp",
+    "0475_n2.webp"
    ]
   },
   {
@@ -9748,7 +9771,8 @@
    "exp": null,
    "photos": [
     "0510_2.webp",
-    "0510_1.webp"
+    "0510_1.webp",
+    "0510_n1.webp"
    ]
   },
   {
@@ -10086,7 +10110,9 @@
    "sale": null,
    "exp": null,
    "photos": [
-    "0528_1.webp"
+    "0528_1.webp",
+    "0528_n1.webp",
+    "0528_n2.webp"
    ]
   },
   {
