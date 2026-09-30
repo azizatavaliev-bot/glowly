@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import type { Product, Video } from '../types'
 import { summary, volume, benefits, forWhom, steps } from '../describe'
 import { photos } from '../photo'
-import { price, cityPrice, saving, som } from '../pricing'
+import { price, cityPrice, saving, som, inStock, ORDER_DAYS } from '../pricing'
 import { split, full } from '../name'
 import videos from '../data/videos.json'
 import { useFavorites, useRecent } from '../store'
@@ -21,7 +21,8 @@ type Props = {
 const WA = '996559050618'
 
 export function orderLink(p: Product): string {
-  const text = `Здравствуйте! Пишу с сайта GLOWLY, хочу заказать:\n${full(p)}${p.spec ? ` (${p.spec})` : ''}\n${p.brand} · ${som(price(p))}\n\nПодскажите, есть в наличии?`
+  const tail = inStock(p) ? 'Когда сможете привезти?' : `Вижу, что под заказ — сколько ждать?`
+  const text = `Здравствуйте! Пишу с сайта GLOWLY, хочу заказать:\n${full(p)}${p.spec ? ` (${p.spec})` : ''}\n${p.brand} · ${som(price(p))}\n\n${tail}`
   return `https://wa.me/${WA}?text=${encodeURIComponent(text)}`
 }
 
@@ -131,7 +132,9 @@ export default function ProductModal({ p, onClose, onBrand, similar, onOpen, pre
               </svg>
             </button>
           </div>
-          <div className="pay-note">Ответим в течение дня · доставка по Бишкеку · оплата при получении</div>
+          {inStock(p)
+            ? <div className="stock-line in">● В наличии · доставка по Бишкеку сегодня-завтра · оплата при получении</div>
+            : <div className="stock-line">○ Под заказ со склада · {ORDER_DAYS} · предоплата не нужна</div>}
 
           <p className="what">{summary(p)}</p>
 

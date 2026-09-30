@@ -9,7 +9,7 @@ import BrandPicker from './components/BrandPicker'
 import Dropdown from './components/Dropdown'
 import { useReveal } from './useReveal'
 import { cover } from './photo'
-import { price, som, TOP } from './pricing'
+import { price, som, TOP, inStock } from './pricing'
 import { split } from './name'
 import { matches, score, HINTS } from './search'
 import { NEEDS, hasNeed, countNeed } from './needs'
@@ -36,6 +36,7 @@ export default function App() {
   const [onlySale, setOnlySale] = useState(false)
   const [need, setNeed] = useState('')
   const [maxPrice, setMaxPrice] = useState(0)   // 0 = без ограничения
+  const [onlyStock, setOnlyStock] = useState(false)
   const [limit, setLimit] = useState(48)
   const [open, setOpen] = useState<Product | null>(null)
   const [brandOpen, setBrandOpen] = useState(false)
@@ -155,17 +156,21 @@ export default function App() {
       if (brand !== 'Все' && p.brand !== brand) return false
       if (onlySale && !p.sale) return false
       if (maxPrice && price(p) > maxPrice) return false
+      if (onlyStock && !inStock(p)) return false
       return matches(p, q)
     })
     if (q.trim() && sort === 'name') return [...r].sort((a, b) => score(b, q) - score(a, q))
+    // то, что на руках, всегда выше того, что ехать две недели
+    const st = (a: Product, b: Product) => Number(inStock(b)) - Number(inStock(a))
+    if (sort === 'name') return [...r].sort((a, b) => st(a, b) || a.name.localeCompare(b.name, 'ru'))
     return [...r].sort((a, b) =>
       sort === 'price-asc' ? a.price - b.price :
       sort === 'price-desc' ? b.price - a.price :
       sort === 'save' ? saving(b) - saving(a) :
       a.name.localeCompare(b.name, 'ru'))
-  }, [q, cat, brand, sort, onlySale, need, maxPrice])
+  }, [q, cat, brand, sort, onlySale, need, maxPrice, onlyStock])
 
-  useEffect(() => { setLimit(48) }, [q, cat, brand, sort, onlySale, need, maxPrice])
+  useEffect(() => { setLimit(48) }, [q, cat, brand, sort, onlySale, need, maxPrice, onlyStock])
   useReveal([list, limit])
 
   const toCatalog = () => catalogRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -214,7 +219,7 @@ export default function App() {
 
       <section className="sales top15" data-reveal id="top">
         <div className="wrap sales-head">
-          <h2>🔥 Топ-15 — берут чаще всего</h2>
+          <h2>🔥 Топ-15 — в наличии, привезём сегодня</h2>
           <button className="link" onClick={() => { setSort('name'); setQ(''); setNeed(''); setCat('Все'); setBrand('Все'); toCatalog() }}>
             весь каталог →
           </button>
@@ -299,8 +304,12 @@ export default function App() {
                 { value: 'save', label: 'Самая большая выгода' },
               ]} />
               <label className="chk">
+                <input type="checkbox" checked={onlyStock} onChange={e => setOnlyStock(e.target.checked)} />
+                В наличии
+              </label>
+              <label className="chk">
                 <input type="checkbox" checked={onlySale} onChange={e => setOnlySale(e.target.checked)} />
-                Только скидки
+                Скидки
               </label>
             </div>
             <div className="hints">

@@ -7,6 +7,10 @@ export const TOP: Record<number, { rank: number; price: number }> = Object.fromE
 )
 export const topRank = (p: Product): number | null => TOP[p.id]?.rank ?? null
 
+/** Физически на руках только топ-15; всё остальное везём под заказ со склада. */
+export const inStock = (p: Product): boolean => !!TOP[p.id]
+export const ORDER_DAYS = '7–14 дней'
+
 /**
  * Цены для покупателя — в сомах.
  * Прайс склада в долларах, поэтому: курс × розничный коэффициент.

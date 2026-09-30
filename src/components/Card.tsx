@@ -1,6 +1,6 @@
 import type { Product } from '../types'
 import { cover, photos } from '../photo'
-import { price, cityPrice, saving, som, topRank } from '../pricing'
+import { price, cityPrice, saving, som, topRank, inStock } from '../pricing'
 import { split } from '../name'
 import { orderLink } from './ProductModal'
 import videos from '../data/videos.json'
@@ -23,6 +23,7 @@ export default function Card({ p, delay, onOpen }: Props) {
   const hasVideo = !!(videos as Record<string, unknown>)[String(p.id)]
   const bigSave = save >= 150
   const rank = topRank(p)
+  const stock = inStock(p)
 
   return (
     <article className="card" data-reveal style={{ transitionDelay: `${delay * 28}ms` }}>
@@ -54,9 +55,10 @@ export default function Card({ p, delay, onOpen }: Props) {
             {save > 0 && <s>{som(cityPrice(p))}</s>}
           </div>
         </div>
+        <div className={stock ? 'stock in' : 'stock'}>{stock ? '● В наличии' : '○ Под заказ'}</div>
         <a className="add wa-btn" href={orderLink(p)} target="_blank" rel="noreferrer"
           onClick={e => e.stopPropagation()}>
-          Заказать
+          {stock ? 'Заказать' : 'Заказать под заказ'}
         </a>
       </div>
     </article>

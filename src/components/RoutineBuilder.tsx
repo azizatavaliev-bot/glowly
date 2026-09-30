@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import type { Product } from '../types'
 import { cover } from '../photo'
-import { price, som } from '../pricing'
+import { price, som, inStock } from '../pricing'
 import { split, full } from '../name'
 import { NEEDS } from '../needs'
 
@@ -40,6 +40,7 @@ function pickFor(all: Product[], stepIdx: number, skin: string, goal: string, of
     if (goalRe && goalRe.test(t)) score += 3
     if (skinRe && skin !== 'normal' && skinRe.test(t)) score += 2
     if (p.photos?.length) score += 1
+    if (inStock(p)) score += 4
     if (p.sale) score += 0.5
     return { p, score }
   }).sort((a, b) => b.score - a.score || a.p.price - b.p.price)
