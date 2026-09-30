@@ -13,17 +13,21 @@ Vite 5 + React 18 + TypeScript, без бэкенда. Данные — стат
 
 ## Ссылки
 - local: http://localhost:5280
-- prod: https://azizatavaliev-bot.github.io/glowly/ (GitHub Pages, ветка gh-pages)
+- **prod: https://web-production-9c31a.up.railway.app/** (Railway, проект `glowly`, сервис `web`)
+- старый прод на GitHub Pages https://azizatavaliev-bot.github.io/glowly/ — больше не обновляется
 
-## Деплой
-```bash
-npm run build:pages                 # сборка с base=/glowly/
-npx gh-pages -d dist -b gh-pages    # публикация
-```
-Railway-токен из Keychain мёртв (Unauthorized) — деплой идёт через GitHub Pages
-аккаунта azizatavaliev-bot. Репозиторий публичный: Pages на бесплатном плане
-приватные репо не обслуживает. Пути к файлам строятся от `import.meta.env.BASE_URL`
-(см. `src/photo.ts`) — иначе на Pages будут 404.
+## Деплой (Railway, с 01.10.2026)
+Сервис собирается из GitHub-репо `azizatavaliev-bot/glowly` по Dockerfile (node build → nginx).
+**Автодеплой при push в main.** Если не подхватилось — толкнуть руками через GraphQL:
+`mutation { serviceInstanceDeployV2(serviceId:"b82fe2d0-8bac-41df-be4a-25520735fe7b", environmentId:"d3e45f71-8d12-4386-b3ae-f2aaf3a382fb") }`
+с заголовком `Authorization: Bearer $(security find-generic-password -a claude-workspace -s railway-token -w)`.
+Project id `4bdaa2dc-bd4d-4ca9-8d51-4d7c6e5cba20`.
+
+**Грабли:** токен из Keychain работает только с GraphQL API (backboard.railway.com/graphql/v2),
+Railway CLI его не принимает ни как RAILWAY_TOKEN, ни как RAILWAY_API_TOKEN. Проект, сервис и
+домен создавались мутациями projectCreate / serviceCreate(source.repo) / serviceDomainCreate.
+`me` в GraphQL не работает — проверять токен через `projects`.
+nginx читает `$PORT` через шаблон в /etc/nginx/templates; index.html с no-cache, статика — 30 дней.
 
 ## Запуск
 ```bash

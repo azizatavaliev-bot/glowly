@@ -1,0 +1,16 @@
+import { chromium } from 'playwright'
+const URL = process.env.URL || 'http://localhost:5280/'
+const b = await chromium.launch()
+const m = await b.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true })
+const errs = []; m.on('pageerror', e => errs.push(e.message.slice(0, 100)))
+await m.goto(URL, { waitUntil: 'networkidle' }); await m.waitForTimeout(1000)
+await m.screenshot({ path: '/tmp/fin1.png' })
+await m.evaluate(() => document.querySelector('#catalog').scrollIntoView()); await m.waitForTimeout(600)
+await m.screenshot({ path: '/tmp/fin2.png' })
+await m.locator('.card .pic').first().click(); await m.waitForTimeout(700)
+await m.evaluate(() => document.querySelector('.modal').scrollTo(0, 560)); await m.waitForTimeout(400)
+await m.screenshot({ path: '/tmp/fin3.png' })
+await m.evaluate(() => document.querySelector('.modal').scrollTo(0, 1500)); await m.waitForTimeout(400)
+await m.screenshot({ path: '/tmp/fin4.png' })
+console.log('sticky панелей:', await m.evaluate(() => [...document.querySelectorAll('*')].filter(e => getComputedStyle(e).position === 'sticky').length), '· blur:', await m.evaluate(() => [...document.querySelectorAll('*')].filter(e => (getComputedStyle(e).backdropFilter || 'none') !== 'none' || (getComputedStyle(e).filter || 'none') !== 'none').length), '· ошибки:', errs.length ? errs : 'нет')
+await b.close()
