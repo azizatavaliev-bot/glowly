@@ -89,11 +89,11 @@ export default function Hero({ all, total, brands, columns, hits: topHits, onSta
           </h1>
           <p>
             <span className="only-wide">
-              {total} средств и {brands} корейских брендов. Привозим напрямую со склада,
-              поэтому дешевле, чем в городе.
+              {total} проверенных хитов от {brands} корейских брендов — все в наличии.
+              Привозим напрямую со склада, поэтому дешевле, чем в городе.
             </span>
             <span className="only-narrow">
-              {total} средств из Кореи. Дешевле, чем в городе.
+              {total} хитов из Кореи, все в наличии. Дешевле, чем в городе.
             </span>
           </p>
 
@@ -127,17 +127,17 @@ export default function Hero({ all, total, brands, columns, hits: topHits, onSta
           </div>
 
           <dl className="stats">
-            <div><dt>{n1}</dt><dd>средств в наличии</dd></div>
+            <div><dt>{n1}</dt><dd>хитов в наличии</dd></div>
             <div><dt>{n2}</dt><dd>корейских брендов</dd></div>
             <div><dt>1 день</dt><dd>доставка по городу</dd></div>
           </dl>
           <div className="stats-line">
-            <b>{total}</b> средств · <b>{brands}</b> брендов · доставка <b>за день</b>
+            <b>{total}</b> хитов в наличии · <b>{brands}</b> брендов · доставка <b>за день</b>
           </div>
         </div>
 
         <div className="hero-rail">
-          <div className="hero-rail-h">🔥 Топ-15 — берут чаще всего</div>
+          <div className="hero-rail-h">🔥 Всё в наличии</div>
           <div className="rail">
             {topHits.map(p => (
               <button className="sale-card" key={p.id} onClick={() => onOpen(p)}>
@@ -167,7 +167,7 @@ export default function Hero({ all, total, brands, columns, hits: topHits, onSta
             </div>
           ))}
           <div className="float f1">🇰🇷 Оригинал со склада</div>
-          <div className="float f2">▶ 384 видеообзора</div>
+          <div className="float f2">✅ Всё в наличии</div>
           <div className="float f3">💸 Дешевле города</div>
         </div>
       </div>

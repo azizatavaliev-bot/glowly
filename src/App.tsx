@@ -21,7 +21,8 @@ import MobileBar from './components/MobileBar'
 import RoutineBuilder from './components/RoutineBuilder'
 
 const meta = data.meta as Meta
-const all = data.products as Product[]
+// на витрине только то, что есть на руках, по ценам из top.json; остальной прайс в данных остаётся
+const all = (data.products as Product[]).filter(inStock)
 
 const WA = '996559050618'
 const waLink = (text: string) => `https://wa.me/${WA}?text=${encodeURIComponent(text)}`
@@ -36,7 +37,6 @@ export default function App() {
   const [onlySale, setOnlySale] = useState(false)
   const [need, setNeed] = useState('')
   const [maxPrice, setMaxPrice] = useState(0)   // 0 = без ограничения
-  const [onlyStock, setOnlyStock] = useState(false)
   const [limit, setLimit] = useState(48)
   const [open, setOpen] = useState<Product | null>(null)
   const [brandOpen, setBrandOpen] = useState(false)
@@ -156,7 +156,6 @@ export default function App() {
       if (brand !== 'Все' && p.brand !== brand) return false
       if (onlySale && !p.sale) return false
       if (maxPrice && price(p) > maxPrice) return false
-      if (onlyStock && !inStock(p)) return false
       return matches(p, q)
     })
     if (q.trim() && sort === 'name') return [...r].sort((a, b) => score(b, q) - score(a, q))
@@ -168,9 +167,9 @@ export default function App() {
       sort === 'price-desc' ? b.price - a.price :
       sort === 'save' ? saving(b) - saving(a) :
       a.name.localeCompare(b.name, 'ru'))
-  }, [q, cat, brand, sort, onlySale, need, maxPrice, onlyStock])
+  }, [q, cat, brand, sort, onlySale, need, maxPrice])
 
-  useEffect(() => { setLimit(48) }, [q, cat, brand, sort, onlySale, need, maxPrice, onlyStock])
+  useEffect(() => { setLimit(48) }, [q, cat, brand, sort, onlySale, need, maxPrice])
   useReveal([list, limit])
 
   const toCatalog = () => catalogRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -219,7 +218,7 @@ export default function App() {
 
       <section className="sales top15" data-reveal id="top">
         <div className="wrap sales-head">
-          <h2>🔥 Топ-15 — в наличии, привезём сегодня</h2>
+          <h2>🔥 Всё в наличии — привезём сегодня</h2>
           <button className="link" onClick={() => { setSort('name'); setQ(''); setNeed(''); setCat('Все'); setBrand('Все'); toCatalog() }}>
             весь каталог →
           </button>
@@ -263,7 +262,7 @@ export default function App() {
         <div className="wrap">
           <h2 className="sec-title">Что вам нужно?</h2>
           <div className="need-grid">
-            {NEEDS.map(n => (
+            {NEEDS.filter(n => countNeed(all, n.key) > 0).map(n => (
               <button key={n.key}
                 className={need === n.key ? 'need on' : 'need'}
                 onClick={() => { setNeed(need === n.key ? '' : n.key); toCatalog() }}>
@@ -304,17 +303,13 @@ export default function App() {
                 { value: 'save', label: 'Самая большая выгода' },
               ]} />
               <label className="chk">
-                <input type="checkbox" checked={onlyStock} onChange={e => setOnlyStock(e.target.checked)} />
-                В наличии
-              </label>
-              <label className="chk">
                 <input type="checkbox" checked={onlySale} onChange={e => setOnlySale(e.target.checked)} />
                 Скидки
               </label>
             </div>
             <div className="hints">
               <span>Цена до:</span>
-              {[800, 1200, 2000, 3500].map(v => (
+              {[1000, 1500].map(v => (
                 <button key={v} className={maxPrice === v ? 'hint on' : 'hint'}
                   onClick={() => setMaxPrice(maxPrice === v ? 0 : v)}>{som(v)}</button>
               ))}
