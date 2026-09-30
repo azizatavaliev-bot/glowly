@@ -1,6 +1,6 @@
 import type { Product } from '../types'
 import { cover, photos } from '../photo'
-import { price, cityPrice, saving, som, topRank, inStock } from '../pricing'
+import { price, cityPrice, saving, som, inStock } from '../pricing'
 import { split } from '../name'
 import { orderLink } from './ProductModal'
 import videos from '../data/videos.json'
@@ -22,7 +22,6 @@ export default function Card({ p, delay, onOpen }: Props) {
   const liked = fav.has(p.id)
   const hasVideo = !!(videos as Record<string, unknown>)[String(p.id)]
   const bigSave = save >= 150
-  const rank = topRank(p)
   const stock = inStock(p)
 
   return (
@@ -34,8 +33,7 @@ export default function Card({ p, delay, onOpen }: Props) {
         {p.sale && <span className="badge">{p.sale.replace('АКЦИЯ ', '−').replace(/ [KS]$/, '')}</span>}
         {shots > 1 && <span className="shots">{shots} фото</span>}
         <div className="tags-tl">
-          {rank && <span className="tag-mini top">🔥 Топ {rank}</span>}
-          {bigSave && !p.sale && !rank && <span className="tag-mini">Выгодно</span>}
+          {bigSave && !p.sale && <span className="tag-mini">Выгодно</span>}
           {hasVideo && <span className="tag-mini video">▶ обзор</span>}
         </div>
         <button className={liked ? 'heart on' : 'heart'} aria-label="В избранное"

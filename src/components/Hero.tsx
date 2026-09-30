@@ -137,7 +137,7 @@ export default function Hero({ all, total, brands, columns, hits: topHits, onSta
         </div>
 
         <div className="hero-rail">
-          <div className="hero-rail-h">🔥 Всё в наличии</div>
+          <div className="hero-rail-h">Наши товары</div>
           <div className="rail">
             {topHits.map(p => (
               <button className="sale-card" key={p.id} onClick={() => onOpen(p)}>

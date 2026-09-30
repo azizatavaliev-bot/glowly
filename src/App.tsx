@@ -216,26 +216,6 @@ export default function App() {
         </div>
       </section>
 
-      <section className="sales top15" data-reveal id="top">
-        <div className="wrap sales-head">
-          <h2>🔥 Всё в наличии — привезём сегодня</h2>
-          <button className="link" onClick={() => { setSort('name'); setQ(''); setNeed(''); setCat('Все'); setBrand('Все'); toCatalog() }}>
-            весь каталог →
-          </button>
-        </div>
-        <div className="rail">
-          {topList.map(({ p, rank }) => (
-            <button className="sale-card" key={p.id} onClick={() => setOpen(p)}>
-              <img src={cover(p) ?? ''} alt="" loading="lazy" />
-              <span className="badge rank">{rank}</span>
-              <b>{p.brand}</b>
-              <i>{split(p).title} {split(p).sub}</i>
-              <u>{som(price(p))}</u>
-            </button>
-          ))}
-        </div>
-      </section>
-
       {!!sales.length && (
         <section className="sales" data-reveal>
           <div className="wrap sales-head">
