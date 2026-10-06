@@ -12,6 +12,10 @@ RDAP + цены Porkbun: lilo.shop/.store/.online/.site — премиум ($137
 нормальные: lilo.asia $11.84/год, lilokorea.com / liloskin.com / lilokg.com $11.08/год,
 lilocosmetics.pro $3.09 первый год → $22.14, lilo.care $11.84 → $39.65.
 whois для новых зон врёт — проверять через https://rdap.org/domain/<имя> (404 = свободен) и цену у регистратора.
+**Выбран lilo.asia** (06.10, Азиз: «разницы нет, главное чтобы сайт был»). В Railway уже заведены
+custom domains: `lilo.asia` → CNAME/ALIAS @ на `e9jc6vlc.up.railway.app`, `www.lilo.asia` → CNAME www на
+`lm6nz005.up.railway.app`. Осталось: Азиз покупает домен на Porkbun, вставляет две записи, ждём SSL.
+lilo.space не подтверждён по цене (Porkbun показал капчу); соседние зоны Radix для «lilo» все премиум.
 korshop.one — сайт склада-поставщика, в футере клиентской витрины его нет.
 
 ## Стек

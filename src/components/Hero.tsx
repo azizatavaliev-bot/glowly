@@ -18,7 +18,7 @@ type Props = {
 }
 
 // слово в заголовке меняется — три причины купить за один взгляд
-const WORDS = ['ниже магазинов', 'прямо из Кореи', 'с доставкой сегодня', 'с оплатой при получении']
+const WORDS = ['по супер-ценам', 'в удобном каталоге', 'прямо из Кореи', 'с доставкой сегодня']
 
 /** Число «набегает» от нуля при появлении — так цифры читаются, а не пролистываются. */
 function useCountUp(target: number, ms = 1100): number {
@@ -80,7 +80,7 @@ export default function Hero({ all, total, brands, columns, hits: topHits, onSta
         <div className="hero-txt">
           <span className="pill"><i /> Доставка по Бишкеку · оплата при получении</span>
           <h1>
-            Корейский уход<br />
+            Корейская косметика<br />
             <span className="swap">
               {WORDS.map((w, i) => (
                 <em key={w} className={i === word ? 'on' : ''}>{w}</em>
@@ -89,11 +89,11 @@ export default function Hero({ all, total, brands, columns, hits: topHits, onSta
           </h1>
           <p>
             <span className="only-wide">
-              {total} проверенных хитов от {brands} корейских брендов — все в наличии.
-              Привозим напрямую со склада, поэтому дешевле, чем в городе.
+              Удобный каталог корейской косметики с супер-ценами: {total} проверенных хитов
+              от {brands} брендов, все в наличии. Выбираете за пару минут — привозим за день.
             </span>
             <span className="only-narrow">
-              {total} хитов из Кореи, все в наличии. Дешевле, чем в городе.
+              Удобный каталог с супер-ценами. {total} хитов в наличии, доставка за день.
             </span>
           </p>
 
