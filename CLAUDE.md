@@ -15,7 +15,9 @@ whois для новых зон врёт — проверять через https:
 **Выбран lilo.asia** (06.10, Азиз: «разницы нет, главное чтобы сайт был»). В Railway уже заведены
 custom domains: `lilo.asia` → CNAME/ALIAS @ на `e9jc6vlc.up.railway.app`, `www.lilo.asia` → CNAME www на
 `lm6nz005.up.railway.app`. Осталось: Азиз покупает домен на Porkbun, вставляет две записи, ждём SSL.
-lilo.space не подтверждён по цене (Porkbun показал капчу); соседние зоны Radix для «lilo» все премиум.
+lilo.space — ПРЕМИУМ (подтверждено на Namecheap), не брать. Покупаем на **Namecheap** (у Азиза там
+аккаунт с привязанной картой): lilo.asia $1.98 первый год, продление $14.48. DNS там же: Advanced DNS →
+ALIAS @ и CNAME www со значениями выше.
 korshop.one — сайт склада-поставщика, в футере клиентской витрины его нет.
 
 ## Стек
