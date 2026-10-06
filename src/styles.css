@@ -48,8 +48,11 @@ h1, h2, h3 { letter-spacing: -.025em; }
   
   border-color: var(--line);
 }
-.logo { border: 0; background: none; font-weight: 800; letter-spacing: .1em; font-size: 20px; padding: 0; }
-.logo span { color: var(--acc); }
+.logo { border: 0; background: none; padding: 0; display: flex; color: var(--ink); }
+.lg { display: inline-flex; flex-direction: column; align-items: stretch; gap: 5px; width: 78px; }
+.lg svg { display: block; width: 100%; height: auto; overflow: visible; }
+.lg-drop { fill: var(--acc); }
+.lg i { font-style: normal; font-weight: 700; font-size: 8px; line-height: 1; letter-spacing: .44em; margin-right: -.44em; text-transform: uppercase; text-align: center; color: var(--mut); }
 .top-right { display: flex; align-items: center; gap: 10px; }
 .cur { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 11px; overflow: hidden; }
 .cur button { border: 0; background: transparent; padding: 8px 13px; font-size: 13px; font-weight: 600; transition: .25s; }
@@ -217,6 +220,8 @@ h1, h2, h3 { letter-spacing: -.025em; }
 /* ───── catalog ───── */
 .catalog { padding-top: 40px; scroll-margin-top: 78px; }
 .sec-title { font-size: 28px; margin: 0 0 18px; }
+/* одно слово заголовка — курсивной антиквой, как в первом экране: единый почерк по всему сайту */
+h2 em { font-family: "Playfair Display", Georgia, serif; font-style: italic; font-weight: 500; color: var(--acc); letter-spacing: -.01em; }
 .sticky {
   position: static; padding: 14px 0 10px;
   border-bottom: 1px solid var(--line); margin-bottom: 20px;
@@ -293,8 +298,9 @@ select { padding: 13px 14px; border: 1px solid var(--line); border-radius: 12px;
 footer { margin-top: 70px; background: var(--dark); color: rgba(255,255,255,.6); padding: 56px 0 46px; }
 .foot-in { display: flex; justify-content: space-between; gap: 34px; flex-wrap: wrap; }
 .foot-in p { max-width: 430px; margin: 12px 0 0; font-size: 13.5px; }
-.foot-logo { font-weight: 800; letter-spacing: .1em; font-size: 24px; color: #fff; }
-.foot-logo span { color: var(--acc); }
+.foot-logo { color: #fff; }
+.foot-logo .lg { width: 104px; gap: 7px; }
+.foot-logo .lg i { font-size: 10px; color: rgba(255,255,255,.55); }
 .foot-links { display: flex; flex-direction: column; gap: 10px; }
 .foot-links a { color: #fff; text-decoration: none; font-weight: 600; }
 .foot-links a:hover { color: var(--acc); }
@@ -866,7 +872,6 @@ a.cart-btn { text-decoration: none; }
 
   /* «Смотреть каталог» дублирует нижнюю панель — на телефоне она лишняя */
   .hero-cta .btn-main { display: none; }
-  .hero-cta .btn-ghost { background: var(--ink); color: #fff; border-color: var(--ink); }
 
   /* компактный поиск в шапке — появляется вместе с матовой подложкой */
   .top.solid .top-search {
@@ -875,7 +880,8 @@ a.cart-btn { text-decoration: none; }
     padding: 9px 12px; font-size: 13px; color: var(--mut); text-align: left;
   }
   .top-search span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .top.solid .logo { font-size: 17px; }
+  .top.solid .lg { width: 62px; gap: 4px; }
+  .top.solid .lg i { font-size: 6.5px; }
   .top.solid .city { display: none; }
   /* при активном поиске кнопка сжимается до иконки, чтобы строке хватило места */
   .top.solid .cart-btn { font-size: 0; padding: 9px 12px; }

@@ -7,8 +7,8 @@ export const TOP: Record<number, { rank: number; price: number }> = Object.fromE
 )
 export const topRank = (p: Product): number | null => TOP[p.id]?.rank ?? null
 
-/** Физически на руках только топ-15; всё остальное везём под заказ со склада. */
-export const inStock = (p: Product): boolean => !!TOP[p.id]
+/** Каталог собирается из прайса «по наличию», поэтому всё, что в нём есть, — на руках. */
+export const inStock = (_p: Product): boolean => true
 export const ORDER_DAYS = '7–14 дней'
 
 /**

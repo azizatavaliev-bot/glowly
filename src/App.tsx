@@ -21,21 +21,25 @@ import MobileBar from './components/MobileBar'
 import RoutineBuilder from './components/RoutineBuilder'
 
 const meta = data.meta as Meta
-// на витрине только то, что есть на руках, по ценам из top.json; остальной прайс в данных остаётся
+// на витрине весь прайс «по наличию»; у позиций из top.json цена владельца, у остальных — формула
 const all = (data.products as Product[]).filter(inStock)
 
-import { BRAND, BRAND_ACCENT, BRAND_FULL, waLink } from './brand'
+import { BRAND_FULL, waLink } from './brand'
+import Logo from './components/Logo'
+
+// фильтры из адреса читаем сразу при старте: эффект записи в адрес иначе успевает их стереть
+const fromUrl = (k: string) => new URLSearchParams(location.search).get(k)
 
 type Sort = 'name' | 'price-asc' | 'price-desc' | 'save'
 
 export default function App() {
-  const [q, setQ] = useState('')
-  const [cat, setCat] = useState('Все')
-  const [brand, setBrand] = useState('Все')
+  const [q, setQ] = useState(() => fromUrl('q') ?? '')
+  const [cat, setCat] = useState(() => fromUrl('cat') ?? 'Все')
+  const [brand, setBrand] = useState(() => fromUrl('brand') ?? 'Все')
   const [sort, setSort] = useState<Sort>('name')
   const [onlySale, setOnlySale] = useState(false)
-  const [need, setNeed] = useState('')
-  const [maxPrice, setMaxPrice] = useState(0)   // 0 = без ограничения
+  const [need, setNeed] = useState(() => fromUrl('need') ?? '')
+  const [maxPrice, setMaxPrice] = useState(() => Number(fromUrl('max') ?? 0))   // 0 = без ограничения
   const [limit, setLimit] = useState(48)
   const [open, setOpen] = useState<Product | null>(null)
   const [brandOpen, setBrandOpen] = useState(false)
@@ -91,15 +95,6 @@ export default function App() {
   }, [q, need, brand, cat, maxPrice, open])
 
   useEffect(() => {
-    const sp = new URLSearchParams(location.search)
-    if (sp.get('q')) setQ(sp.get('q')!)
-    if (sp.get('need')) setNeed(sp.get('need')!)
-    if (sp.get('brand')) setBrand(sp.get('brand')!)
-    if (sp.get('cat')) setCat(sp.get('cat')!)
-    if (sp.get('max')) setMaxPrice(Number(sp.get('max')))
-  }, [])
-
-  useEffect(() => {
     const on = () => setScrolled(window.scrollY > 40)
     on()
     window.addEventListener('scroll', on, { passive: true })
@@ -133,7 +128,7 @@ export default function App() {
     const pct = (p: Product) => Number(p.sale?.match(/(\d+)%/)?.[1] ?? 0)
     const seen = new Set<string>()
     return all
-      .filter(p => p.sale && p.img)
+      .filter(p => p.sale && p.photos?.length)
       .sort((a, b) => pct(b) - pct(a))
       .filter(p => !seen.has(p.brand) && seen.add(p.brand))
       .slice(0, 12)
@@ -142,7 +137,7 @@ export default function App() {
   // три ленты фото в шапке: по одному товару на бренд, чтобы витрина выглядела разной
   const columns = useMemo(() => {
     const seen = new Set<string>()
-    const pool = all.filter(p => p.img && !seen.has(p.brand) && seen.add(p.brand))
+    const pool = all.filter(p => p.photos?.length && !seen.has(p.brand) && seen.add(p.brand))
     const cols: Product[][] = [[], [], []]
     pool.slice(0, 27).forEach((p, i) => cols[i % 3].push(p))
     return cols
@@ -158,8 +153,9 @@ export default function App() {
       return matches(p, q)
     })
     if (q.trim() && sort === 'name') return [...r].sort((a, b) => score(b, q) - score(a, q))
-    // то, что на руках, всегда выше того, что ехать две недели
-    const st = (a: Product, b: Product) => Number(inStock(b)) - Number(inStock(a))
+    // сначала позиции владельца в его порядке, потом товары с крупными фото, потом по алфавиту
+    const rk = (p: Product) => TOP[p.id]?.rank ?? (p.photos?.length ? 100 : 200)
+    const st = (a: Product, b: Product) => rk(a) - rk(b)
     if (sort === 'name') return [...r].sort((a, b) => st(a, b) || a.name.localeCompare(b.name, 'ru'))
     return [...r].sort((a, b) =>
       sort === 'price-asc' ? a.price - b.price :
@@ -178,8 +174,8 @@ export default function App() {
     <>
       <header className={scrolled ? 'top solid' : 'top'}>
         <div className="wrap top-in">
-          <button className="logo" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            {BRAND}<span> {BRAND_ACCENT}</span>
+          <button className="logo" aria-label={BRAND_FULL} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <Logo />
           </button>
           <button className="top-search" onClick={() => {
             const el = document.querySelector<HTMLInputElement>('.catalog .search')
@@ -218,7 +214,7 @@ export default function App() {
       {!!sales.length && (
         <section className="sales" data-reveal>
           <div className="wrap sales-head">
-            <h2>Скидки недели</h2>
+            <h2>Скидки <em>недели</em></h2>
             <button className="link" onClick={() => { setOnlySale(true); toCatalog() }}>
               смотреть все →
             </button>
@@ -227,7 +223,7 @@ export default function App() {
             {sales.map(p => (
               <button className="sale-card" key={p.id} onClick={() => setOpen(p)}>
                 <img src={cover(p) ?? ''} alt={p.name} loading="lazy" />
-                <span className="badge">{p.sale!.replace('АКЦИЯ ', '−').replace(/ [KS]$/, '')}</span>
+                <span className="badge">−{p.sale!.match(/(\d+)%/)?.[1]}%</span>
                 <b>{p.brand}</b>
                 <i>{split(p).title}</i>
                 <u>{som(price(p))}</u>
@@ -239,7 +235,7 @@ export default function App() {
 
       <section className="needs" data-reveal>
         <div className="wrap">
-          <h2 className="sec-title">Что вам нужно?</h2>
+          <h2 className="sec-title">Что вам <em>нужно?</em></h2>
           <div className="need-grid">
             {NEEDS.filter(n => countNeed(all, n.key) > 0).map(n => (
               <button key={n.key}
@@ -344,7 +340,7 @@ export default function App() {
       {recentItems.length > 1 && (
         <section className="recent">
           <div className="wrap sales-head">
-            <h2>Вы смотрели</h2>
+            <h2>Вы <em>смотрели</em></h2>
           </div>
           <div className="rail">
             {recentItems.map(p => (
@@ -361,7 +357,7 @@ export default function App() {
 
       <section className="how" data-reveal>
         <div className="wrap">
-          <h2 className="sec-title">Как заказать</h2>
+          <h2 className="sec-title">Как <em>заказать</em></h2>
           <div className="how-grid">
             <div><span>1</span><b>Выбираете товар</b><p>Жмёте «Заказать» — откроется WhatsApp с уже готовым сообщением.</p></div>
             <div><span>2</span><b>Мы подтверждаем</b><p>Проверяем наличие, называем срок доставки и итоговую сумму.</p></div>
@@ -376,7 +372,7 @@ export default function App() {
 
       <section className="faq" data-reveal>
         <div className="wrap">
-          <h2 className="sec-title">Частые вопросы</h2>
+          <h2 className="sec-title">Частые <em>вопросы</em></h2>
           <div className="faq-grid">
             <details><summary>Это оригинал?</summary><p>Да. Товар приходит со склада корейского поставщика, с корейскими штрихкодами и сроками годности на упаковке.</p></details>
             <details><summary>Сколько идёт доставка?</summary><p>По Бишкеку — обычно в день заказа или на следующий. В регионы отправляем транспортной компанией.</p></details>
@@ -391,7 +387,7 @@ export default function App() {
       <footer>
         <div className="wrap foot-in">
           <div>
-            <div className="foot-logo">{BRAND}<span> {BRAND_ACCENT}</span></div>
+            <div className="foot-logo"><Logo /></div>
             <p>{BRAND_FULL} — корейская косметика в Бишкеке. Цены в сомах, доставка по городу,
               оплата при получении. Наличие уточняйте в WhatsApp.</p>
           </div>

@@ -89,11 +89,11 @@ export default function Hero({ all, total, brands, columns, hits: topHits, onSta
           </h1>
           <p>
             <span className="only-wide">
-              Удобный каталог корейской косметики с супер-ценами: {total} проверенных хитов
+              Удобный каталог корейской косметики с супер-ценами: {total} товаров
               от {brands} брендов, все в наличии. Выбираете за пару минут — привозим за день.
             </span>
             <span className="only-narrow">
-              Удобный каталог с супер-ценами. {total} хитов в наличии, доставка за день.
+              Удобный каталог с супер-ценами. {total} товаров в наличии, доставка за день.
             </span>
           </p>
 
@@ -127,12 +127,12 @@ export default function Hero({ all, total, brands, columns, hits: topHits, onSta
           </div>
 
           <dl className="stats">
-            <div><dt>{n1}</dt><dd>хитов в наличии</dd></div>
+            <div><dt>{n1}</dt><dd>товаров в наличии</dd></div>
             <div><dt>{n2}</dt><dd>корейских брендов</dd></div>
             <div><dt>1 день</dt><dd>доставка по городу</dd></div>
           </dl>
           <div className="stats-line">
-            <b>{total}</b> хитов в наличии · <b>{brands}</b> брендов · доставка <b>за день</b>
+            <b>{total}</b> товаров в наличии · <b>{brands}</b> брендов · доставка <b>за день</b>
           </div>
         </div>
 

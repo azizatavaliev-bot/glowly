@@ -71,7 +71,7 @@ export default function RoutineBuilder({ all, onOpen, wa }: Props) {
     <section className="routine" id="routine" data-reveal>
       <div className="wrap">
         <div className="routine-head">
-          <h2 className="sec-title">Подобрать уход за 30 секунд</h2>
+          <h2 className="sec-title">Подобрать уход <em>за 30 секунд</em></h2>
           <p>Два вопроса — и готовая схема из пяти шагов с ценами. Любой шаг можно заменить.</p>
         </div>
 

@@ -1,4 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <rect width="512" height="512" rx="112" fill="#16130f"/>
-  <text x="256" y="300" text-anchor="middle" font-family="-apple-system, Manrope, Helvetica, Arial, sans-serif" font-weight="800" font-size="150" letter-spacing="6" fill="#ffffff">L<tspan fill="#c0563c">I</tspan></text>
+  <g fill="none" stroke="#ffffff" stroke-width="30" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M124 150V362H222"/>
+    <circle cx="318" cy="256" r="106"/>
+  </g>
+  <path fill="#c0563c" d="M318 192c28 35 43 58 43 80a43 43 0 0 1-86 0c0-22 15-45 43-80Z"/>
 </svg>

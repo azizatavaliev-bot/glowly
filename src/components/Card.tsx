@@ -25,7 +25,6 @@ export default function Card({ p, onOpen }: Props) {
         {pic
           ? <img src={pic} alt={p.name} loading="lazy" />
           : <div className="noimg">нет фото</div>}
-        {p.sale && <span className="badge">{p.sale.replace('АКЦИЯ ', '−').replace(/ [KS]$/, '')}</span>}
         <button className={liked ? 'heart on' : 'heart'} aria-label="В избранное"
           onClick={e => { e.stopPropagation(); fav.toggle(p.id); toast(liked ? 'Убрано из избранного' : '❤️ Добавлено в избранное') }}>
           {liked ? '♥' : '♡'}

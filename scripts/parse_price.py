@@ -6,7 +6,7 @@ import openpyxl
 from PIL import Image
 import io
 
-SRC = sys.argv[1] if len(sys.argv) > 1 else str(Path.home() / "Desktop/прайс 8.09.xlsx")
+SRC = sys.argv[1] if len(sys.argv) > 1 else str(Path.home() / "Desktop/прайс по наличию 29,09.xlsx")
 ROOT = Path(__file__).resolve().parent.parent
 IMG_DIR = ROOT / "public/img"
 IMG_DIR.mkdir(parents=True, exist_ok=True)
@@ -53,19 +53,40 @@ def category(name):
         if any(k in n for k in keys): return cat
     return "Прочее"
 
+# id товара держим постоянным между прайсами: на него завязаны фото, описания, видео и цены витрины.
+# Ключ — штрихкод + характеристика; новым позициям выдаём следующий свободный номер.
+PREV_FILE = ROOT / "src/data/products.json"
+prev = json.loads(PREV_FILE.read_text(encoding="utf-8"))["products"] if PREV_FILE.exists() else []
+prev_by_code = {(p["barcode"], p["spec"]): p for p in prev if p["barcode"]}
+prev_by_name = {(p["full"], p["spec"]): p for p in prev}
+next_id = max([p["id"] for p in prev], default=0) + 1
+KEEP = {t["id"] for t in json.loads((ROOT / "src/data/top.json").read_text(encoding="utf-8"))}
+# разделы прайса, которые покупателю не показываем
+SKIP = re.compile(r"^(ДОСТАВКА|ПРОБНИКИ|ТОВАР С ДЕФЕКТОМ|ИТОГО)", re.I)
+
 products, brand = [], None
 sale = None
+skip = False
+seen = set()
 for i, row in enumerate(ws.iter_rows(min_row=6, values_only=True), start=6):
     name, spec, _f, unit, barcode, pack, price, *_ = row
     if not name: continue
     name = str(name).strip()
     p = num(price)
     if p is None:                      # строка-заголовок бренда/раздела
-        if re.match(r"^АКЦИЯ", name, re.I):
+        skip = bool(SKIP.match(name))
+        if re.match(r"^АКЦИЯ", name, re.I) or re.search(r"\d+%\s*$", name):
             sale, brand = name.strip(), name.strip()
         else:
             brand, sale = name, None
         continue
+    if skip: continue
+    spec_s = str(spec).strip() if spec else None
+    code = str(barcode) if barcode else None
+    old = prev_by_code.get((code, spec_s)) or prev_by_name.get((name, spec_s))
+    key = (code or name, spec_s)
+    if key in seen: continue           # позиция повторяется в разделе акций — берём первую
+    seen.add(key)
     im = images.get(i)
     img_name = None
     if im:
@@ -81,7 +102,7 @@ for i, row in enumerate(ws.iter_rows(min_row=6, values_only=True), start=6):
     clean = re.sub(r"\s*\(([^()]+)\)\s*(EXP\s*[\d.]+)?\s*$", "", name).strip()
     clean = re.sub(r"^АКЦИЯ\s+", "", clean)
     products.append({
-        "id": len(products) + 1,
+        "id": old["id"] if old else next_id,
         "name": clean or name,
         "full": name,
         "brand": real_brand.upper(),
@@ -95,9 +116,16 @@ for i, row in enumerate(ws.iter_rows(min_row=6, values_only=True), start=6):
         "cat": category(name),
         "sale": sale,
         "exp": exp.group(1) if exp else None,
+        **({"photos": old["photos"]} if old and old.get("photos") else {}),
     })
+    if not old: next_id += 1
 
-meta = {"currency": "USD", "date": "7 сентября 2026", "site": "www.korshop.one", "contact": "+996-559-050-618"}
+# позиции витрины с ценой владельца остаются, даже если в свежем прайсе их нет
+have = {p["id"] for p in products}
+products += [p for p in prev if p["id"] in KEEP and p["id"] not in have]
+assert len({p["id"] for p in products}) == len(products), "дубли id"
+
+meta = {"currency": "USD", "date": "29 сентября 2026", "site": "www.korshop.one", "contact": "+996-559-050-618"}
 out = ROOT / "src/data"
 out.mkdir(parents=True, exist_ok=True)
 (out / "products.json").write_text(json.dumps({"meta": meta, "products": products}, ensure_ascii=False, indent=1), encoding="utf-8")
