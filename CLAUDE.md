@@ -7,7 +7,11 @@
 Азиз в одном сообщении назвал и «Lilova Cosmetics», утверждённый вариант — LILO).
 Репозиторий остался `azizatavaliev-bot/glowly`, Railway-проект `glowly`. Локальная папка —
 `korshop-catalog`: на её `node_modules` симлинком завязан соседний KorProfit, не переименовывать.
-Домен пока не куплен; на 06.10 свободны lilo.kg, lilova.kg, lilocosmetics.kg, lilo-cosmetics.com.
+Домен пока не куплен. Азиз хочет НЕ .kg (просил lilo.pro — занят с 2020). Проверено 06.10 через
+RDAP + цены Porkbun: lilo.shop/.store/.online/.site — премиум ($137–546/год, не брать);
+нормальные: lilo.asia $11.84/год, lilokorea.com / liloskin.com / lilokg.com $11.08/год,
+lilocosmetics.pro $3.09 первый год → $22.14, lilo.care $11.84 → $39.65.
+whois для новых зон врёт — проверять через https://rdap.org/domain/<имя> (404 = свободен) и цену у регистратора.
 korshop.one — сайт склада-поставщика, в футере клиентской витрины его нет.
 
 ## Стек
