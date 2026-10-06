@@ -25,7 +25,8 @@ Vite 5 + React 18 + TypeScript, без бэкенда. Данные — стат
 
 ## Ссылки
 - local: http://localhost:5280
-- **prod: https://web-production-9c31a.up.railway.app/** (Railway, проект `glowly`, сервис `web`)
+- **prod: https://lilo.asia** (домен куплен 06.10.2026 на Namecheap, действует до 06.10.2027, продление ~$14.48)
+- технический адрес Railway: https://web-production-9c31a.up.railway.app/ (проект `glowly`, сервис `web`)
 - старый прод на GitHub Pages https://azizatavaliev-bot.github.io/glowly/ — больше не обновляется
 
 ## Деплой (Railway, с 01.10.2026)
