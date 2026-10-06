@@ -136,3 +136,7 @@
 
 ## 2026-10-01 02:00
 - Railway: автодеплой по push не работает, нужен serviceInstanceDeploy с commitSha — записано в CLAUDE.md
+
+## 2026-10-06 13:30
+- Магазин переименован в LILO Cosmetics: бренд вынесен в src/brand.ts, обновлены логотип, иконка (LI), манифест, метатеги и тексты WhatsApp
+- Проверена доступность доменов: свободны lilo.kg, lilova.kg, lilocosmetics.kg, lilo-cosmetics.com

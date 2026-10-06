@@ -24,8 +24,7 @@ const meta = data.meta as Meta
 // на витрине только то, что есть на руках, по ценам из top.json; остальной прайс в данных остаётся
 const all = (data.products as Product[]).filter(inStock)
 
-const WA = '996559050618'
-const waLink = (text: string) => `https://wa.me/${WA}?text=${encodeURIComponent(text)}`
+import { BRAND, BRAND_ACCENT, BRAND_FULL, waLink } from './brand'
 
 type Sort = 'name' | 'price-asc' | 'price-desc' | 'save'
 
@@ -180,7 +179,7 @@ export default function App() {
       <header className={scrolled ? 'top solid' : 'top'}>
         <div className="wrap top-in">
           <button className="logo" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            GLOW<span>LY</span>
+            {BRAND}<span> {BRAND_ACCENT}</span>
           </button>
           <button className="top-search" onClick={() => {
             const el = document.querySelector<HTMLInputElement>('.catalog .search')
@@ -192,7 +191,7 @@ export default function App() {
             <button className="fav-btn" onClick={() => setFavOpen(true)} aria-label="Избранное">
               ♥{fav.ids.length > 0 && <b>{fav.ids.length}</b>}
             </button>
-            <a className="cart-btn" href={waLink('Здравствуйте! Пишу с сайта GLOWLY — хочу спросить про косметику 🙂')}
+            <a className="cart-btn" href={waLink('Здравствуйте! Пишу с сайта LILO Cosmetics — хочу спросить про косметику 🙂')}
               target="_blank" rel="noreferrer">
               Написать в WhatsApp
             </a>
@@ -203,7 +202,7 @@ export default function App() {
       <Hero all={all} total={all.length} brands={brands.length - 1}
         columns={columns} hits={topList.map(t => t.p)} onStart={toCatalog} onOpen={setOpen}
         onSearch={qq => { setQ(qq); setNeed(''); setCat('Все'); setBrand('Все'); toCatalog() }}
-        wa={waLink('Здравствуйте! Пишу с сайта GLOWLY — помогите подобрать уход 🙂')} />
+        wa={waLink('Здравствуйте! Пишу с сайта LILO Cosmetics — помогите подобрать уход 🙂')} />
 
       <Marquee items={brands.slice(1)} onPick={pickBrand} />
 
@@ -334,7 +333,7 @@ export default function App() {
           {!list.length && (
             <div className="empty">
               Ничего не нашлось.{' '}
-              <a href={waLink('Здравствуйте! Пишу с сайта GLOWLY — ищу товар, которого нет в каталоге.')} target="_blank" rel="noreferrer">
+              <a href={waLink('Здравствуйте! Пишу с сайта LILO Cosmetics — ищу товар, которого нет в каталоге.')} target="_blank" rel="noreferrer">
                 Напишите нам — привезём под заказ
               </a>
             </div>
@@ -368,7 +367,7 @@ export default function App() {
             <div><span>2</span><b>Мы подтверждаем</b><p>Проверяем наличие, называем срок доставки и итоговую сумму.</p></div>
             <div><span>3</span><b>Получаете и платите</b><p>Курьер по Бишкеку, оплата наличными или переводом при получении.</p></div>
           </div>
-          <a className="add big wa-btn how-cta" href={waLink('Здравствуйте! Пишу с сайта GLOWLY — хочу заказать 🙂')}
+          <a className="add big wa-btn how-cta" href={waLink('Здравствуйте! Пишу с сайта LILO Cosmetics — хочу заказать 🙂')}
             target="_blank" rel="noreferrer">
             Написать в WhatsApp
           </a>
@@ -392,8 +391,8 @@ export default function App() {
       <footer>
         <div className="wrap foot-in">
           <div>
-            <div className="foot-logo">GLOW<span>LY</span></div>
-            <p>GLOWLY — корейская косметика в Бишкеке. Цены в сомах, доставка по городу,
+            <div className="foot-logo">{BRAND}<span> {BRAND_ACCENT}</span></div>
+            <p>{BRAND_FULL} — корейская косметика в Бишкеке. Цены в сомах, доставка по городу,
               оплата при получении. Наличие уточняйте в WhatsApp.</p>
           </div>
           <div className="foot-links">
@@ -437,14 +436,14 @@ export default function App() {
 
       <Toast />
 
-      <a className="fab wa-fab" href={waLink('Здравствуйте! Пишу с сайта GLOWLY — есть вопрос 🙂')}
+      <a className="fab wa-fab" href={waLink('Здравствуйте! Пишу с сайта LILO Cosmetics — есть вопрос 🙂')}
         target="_blank" rel="noreferrer">
         💬 Написать нам
       </a>
 
       <MobileBar favCount={fav.ids.length} onCatalog={toCatalog} onRoutine={toRoutine}
         onFav={() => setFavOpen(true)}
-        wa={waLink('Здравствуйте! Пишу с сайта GLOWLY 🙂')} />
+        wa={waLink('Здравствуйте! Пишу с сайта LILO Cosmetics 🙂')} />
     </>
   )
 }

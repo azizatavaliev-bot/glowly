@@ -21,7 +21,7 @@ export default function FavPanel({ items, onOpen, onRemove, onClear, onClose, wa
   }, [onClose])
 
   const total = items.reduce((s, p) => s + price(p), 0)
-  const text = `Здравствуйте! Пишу с сайта GLOWLY, хочу заказать:\n\n${items
+  const text = `Здравствуйте! Пишу с сайта LILO Cosmetics, хочу заказать:\n\n${items
     .map((p, i) => `${i + 1}. ${full(p)}${p.spec ? ` (${p.spec})` : ''} — ${som(price(p))}`)
     .join('\n')}\n\nИтого: ${som(total)}. Всё есть в наличии?`
 

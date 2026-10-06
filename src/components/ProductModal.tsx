@@ -35,7 +35,7 @@ const WA = '996559050618'
 
 export function orderLink(p: Product): string {
   const tail = inStock(p) ? 'Когда сможете привезти?' : 'Вижу, что под заказ — сколько ждать?'
-  const text = `Здравствуйте! Пишу с сайта GLOWLY, хочу заказать:\n${full(p)}${p.spec ? ` (${p.spec})` : ''}\n${p.brand} · ${som(price(p))}\n\n${tail}`
+  const text = `Здравствуйте! Пишу с сайта LILO Cosmetics, хочу заказать:\n${full(p)}${p.spec ? ` (${p.spec})` : ''}\n${p.brand} · ${som(price(p))}\n\n${tail}`
   return `https://wa.me/${WA}?text=${encodeURIComponent(text)}`
 }
 
@@ -76,7 +76,7 @@ export default function ProductModal({ p, onClose, onBrand, similar, onOpen, pre
 
   const share = async () => {
     const url = `${location.origin}${location.pathname}?p=${p.id}`
-    const data = { title: `${split(p).title} — GLOWLY`, text: `${full(p)} · ${som(price(p))}`, url }
+    const data = { title: `${split(p).title} — LILO Cosmetics`, text: `${full(p)} · ${som(price(p))}`, url }
     if (navigator.share) { try { await navigator.share(data) } catch { /* отменили */ } }
     else { await navigator.clipboard.writeText(url); toast('Ссылка скопирована') }
   }

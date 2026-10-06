@@ -64,7 +64,7 @@ export default function RoutineBuilder({ all, onOpen, wa }: Props) {
 
   const orderText = () => {
     const lines = routine.filter(r => r.p).map(r => `${r.step.emoji} ${r.step.label}: ${full(r.p!)} — ${som(price(r.p!))}`)
-    return `Здравствуйте! Пишу с сайта GLOWLY. Подобрала уход для ${SKIN.find(s => s.key === skin)?.label.toLowerCase()} кожи (${GOALS.find(g => g.key === goal)?.label.toLowerCase()}):\n\n${lines.join('\n')}\n\nИтого: ${som(total)}. Всё есть в наличии?`
+    return `Здравствуйте! Пишу с сайта LILO Cosmetics. Подобрала уход для ${SKIN.find(s => s.key === skin)?.label.toLowerCase()} кожи (${GOALS.find(g => g.key === goal)?.label.toLowerCase()}):\n\n${lines.join('\n')}\n\nИтого: ${som(total)}. Всё есть в наличии?`
   }
 
   return (
