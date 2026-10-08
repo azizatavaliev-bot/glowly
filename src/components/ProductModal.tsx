@@ -6,7 +6,9 @@ import { price, cityPrice, saving, som, inStock, ORDER_DAYS } from '../pricing'
 import { split, full } from '../name'
 import videos from '../data/videos.json'
 import details from '../data/details.json'
-import { useFavorites, useRecent } from '../store'
+import { useFavorites, useRecent, useCart, openCart } from '../store'
+import BuyButton from './BuyButton'
+import { waLink } from '../brand'
 import { toast } from './Toast'
 
 type Props = {
@@ -31,12 +33,10 @@ type Detail = {
   faq?: string[][]
 }
 
-const WA = '996559050618'
-
 export function orderLink(p: Product): string {
-  const tail = inStock(p) ? 'Когда сможете привезти?' : 'Вижу, что под заказ — сколько ждать?'
-  const text = `Здравствуйте! Пишу с сайта LILO Cosmetics, хочу заказать:\n${full(p)}${p.spec ? ` (${p.spec})` : ''}\n${p.brand} · ${som(price(p))}\n\n${tail}`
-  return `https://wa.me/${WA}?text=${encodeURIComponent(text)}`
+  const tail = inStock(p) ? 'Подскажите, пожалуйста, подробнее.' : 'Вижу, что под заказ — сколько ждать?'
+  const text = `Здравствуйте! Пишу с сайта LILO Cosmetics, интересует товар:\n${full(p)}${p.spec ? ` (${p.spec})` : ''}\n${p.brand} · ${som(price(p))}\n\n${tail}`
+  return waLink(text)
 }
 
 export default function ProductModal({ p, onClose, onBrand, similar, onOpen, prev, next }: Props) {
@@ -52,6 +52,8 @@ export default function ProductModal({ p, onClose, onBrand, similar, onOpen, pre
   const clip = (videos as Record<string, Video[]>)[String(p.id)]?.[0]
   const save = saving(p)
   const fav = useFavorites()
+  const cart = useCart()
+  const inCart = cart.qty(p.id)
   const recent = useRecent()
   const liked = fav.has(p.id)
 
@@ -157,9 +159,7 @@ export default function ProductModal({ p, onClose, onBrand, similar, onOpen, pre
           </div>
 
           <div className="m-cta">
-            <a className="add big wa-btn" href={orderLink(p)} target="_blank" rel="noreferrer">
-              Заказать в WhatsApp
-            </a>
+            <BuyButton p={p} big />
             <button className={liked ? 'heart-big on' : 'heart-big'}
               onClick={() => { fav.toggle(p.id); toast(liked ? 'Убрано из избранного' : '❤️ Добавлено в избранное') }}
               aria-label="В избранное">{liked ? '♥' : '♡'}</button>
@@ -272,10 +272,12 @@ export default function ProductModal({ p, onClose, onBrand, similar, onOpen, pre
         </div>
 
         {/* на телефоне кнопка заказа всегда под рукой */}
-        <a className="m-buy" href={orderLink(p)} target="_blank" rel="noreferrer">
-          <span>{som(price(p))}</span>
-          Заказать в WhatsApp
-        </a>
+        {inCart
+          ? <button className="m-buy in" onClick={openCart}><span>{inCart} шт</span>В корзине · оформить заказ</button>
+          : <button className="m-buy" onClick={() => { cart.add(p.id); toast('🛒 Добавлено в корзину') }}>
+              <span>{som(price(p))}</span>В корзину
+            </button>}
+        <a className="m-ask" href={orderLink(p)} target="_blank" rel="noreferrer">Спросить про товар в WhatsApp</a>
       </div>
     </div>
   )

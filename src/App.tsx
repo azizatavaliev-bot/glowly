@@ -14,7 +14,8 @@ import { split } from './name'
 import { matches, score, HINTS } from './search'
 import { NEEDS, hasNeed, countNeed } from './needs'
 import { saving } from './pricing'
-import { useFavorites, useRecent } from './store'
+import { useFavorites, useRecent, useCart } from './store'
+import CartPanel from './components/CartPanel'
 import FavPanel from './components/FavPanel'
 import Toast from './components/Toast'
 import MobileBar from './components/MobileBar'
@@ -29,6 +30,12 @@ import Logo from './components/Logo'
 
 // фильтры из адреса читаем сразу при старте: эффект записи в адрес иначе успевает их стереть
 const fromUrl = (k: string) => new URLSearchParams(location.search).get(k)
+
+const Bag = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="M5 8h14l-1 12H6L5 8Z" /><path d="M9 8V6a3 3 0 0 1 6 0v2" />
+  </svg>
+)
 
 type Sort = 'name' | 'price-asc' | 'price-desc' | 'save'
 
@@ -45,6 +52,13 @@ export default function App() {
   const [brandOpen, setBrandOpen] = useState(false)
   const [favOpen, setFavOpen] = useState(false)
   const fav = useFavorites()
+  const cart = useCart()
+  const [cartOpen, setCartOpen] = useState(false)
+  useEffect(() => {
+    const on = () => { setFavOpen(false); setCartOpen(true) }
+    window.addEventListener('lilo:cart-open', on)
+    return () => window.removeEventListener('lilo:cart-open', on)
+  }, [])
   const recent = useRecent()
   const favItems = fav.ids.map(id => all.find(p => p.id === id)).filter((p): p is Product => !!p)
   const recentItems = recent.ids.map(id => all.find(p => p.id === id)).filter((p): p is Product => !!p)
@@ -102,8 +116,8 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    document.body.classList.toggle('locked', !!open || brandOpen || favOpen)
-  }, [open, brandOpen, favOpen])
+    document.body.classList.toggle('locked', !!open || brandOpen || favOpen || cartOpen)
+  }, [open, brandOpen, favOpen, cartOpen])
 
   const cats = useMemo(() => {
     const c = new Map<string, number>()
@@ -187,6 +201,9 @@ export default function App() {
             <button className="fav-btn" onClick={() => setFavOpen(true)} aria-label="Избранное">
               ♥{fav.ids.length > 0 && <b>{fav.ids.length}</b>}
             </button>
+            <button className="fav-btn bag-btn" onClick={() => setCartOpen(true)} aria-label="Корзина">
+              <Bag />{cart.count > 0 && <b>{cart.count}</b>}
+            </button>
             <a className="cart-btn" href={waLink('Здравствуйте! Пишу с сайта LILO Cosmetics — хочу спросить про косметику 🙂')}
               target="_blank" rel="noreferrer">
               Написать в WhatsApp
@@ -250,7 +267,7 @@ export default function App() {
         </div>
       </section>
 
-      <RoutineBuilder all={all} onOpen={setOpen} wa={waLink} />
+      <RoutineBuilder all={all} onOpen={setOpen} />
 
       <div className="catalog" ref={catalogRef} id="catalog">
         <div className="wrap">
@@ -359,7 +376,7 @@ export default function App() {
         <div className="wrap">
           <h2 className="sec-title">Как <em>заказать</em></h2>
           <div className="how-grid">
-            <div><span>1</span><b>Выбираете товар</b><p>Жмёте «Заказать» — откроется WhatsApp с уже готовым сообщением.</p></div>
+            <div><span>1</span><b>Собираете корзину</b><p>Жмёте «В корзину» на нужных товарах, в корзине — «Отправить заказ»: откроется WhatsApp с готовым сообщением и номером заказа.</p></div>
             <div><span>2</span><b>Мы подтверждаем</b><p>Проверяем наличие, называем срок доставки и итоговую сумму.</p></div>
             <div><span>3</span><b>Получаете и платите</b><p>Курьер по Бишкеку, оплата наличными или переводом при получении.</p></div>
           </div>
@@ -410,8 +427,13 @@ export default function App() {
         />
       )}
 
+      {cartOpen && (
+        <CartPanel all={all} onClose={() => setCartOpen(false)}
+          onOpen={p => { setCartOpen(false); setOpen(p) }} />
+      )}
+
       {favOpen && (
-        <FavPanel items={favItems} wa={waLink}
+        <FavPanel items={favItems}
           onOpen={p => { setFavOpen(false); setOpen(p) }}
           onRemove={fav.toggle} onClear={fav.clear} onClose={() => setFavOpen(false)} />
       )}
@@ -439,6 +461,7 @@ export default function App() {
 
       <MobileBar favCount={fav.ids.length} onCatalog={toCatalog} onRoutine={toRoutine}
         onFav={() => setFavOpen(true)}
+        cartCount={cart.count} onCart={() => setCartOpen(true)}
         wa={waLink('Здравствуйте! Пишу с сайта LILO Cosmetics 🙂')} />
     </>
   )

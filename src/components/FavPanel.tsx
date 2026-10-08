@@ -2,7 +2,8 @@ import { useEffect } from 'react'
 import type { Product } from '../types'
 import { cover } from '../photo'
 import { price, som } from '../pricing'
-import { split, full } from '../name'
+import { split } from '../name'
+import { useCart, openCart } from '../store'
 
 type Props = {
   items: Product[]
@@ -10,10 +11,9 @@ type Props = {
   onRemove: (id: number) => void
   onClear: () => void
   onClose: () => void
-  wa: (text: string) => string
 }
 
-export default function FavPanel({ items, onOpen, onRemove, onClear, onClose, wa }: Props) {
+export default function FavPanel({ items, onOpen, onRemove, onClear, onClose }: Props) {
   useEffect(() => {
     const esc = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
     document.addEventListener('keydown', esc)
@@ -21,9 +21,8 @@ export default function FavPanel({ items, onOpen, onRemove, onClear, onClose, wa
   }, [onClose])
 
   const total = items.reduce((s, p) => s + price(p), 0)
-  const text = `Здравствуйте! Пишу с сайта LILO Cosmetics, хочу заказать:\n\n${items
-    .map((p, i) => `${i + 1}. ${full(p)}${p.spec ? ` (${p.spec})` : ''} — ${som(price(p))}`)
-    .join('\n')}\n\nИтого: ${som(total)}. Всё есть в наличии?`
+  const cart = useCart()
+  const toCart = () => { items.forEach(p => { if (!cart.qty(p.id)) cart.add(p.id) }); openCart() }
 
   return (
     <div className="overlay" onClick={onClose}>
@@ -35,7 +34,7 @@ export default function FavPanel({ items, onOpen, onRemove, onClear, onClose, wa
 
         {!items.length && (
           <div className="empty">
-            Пока пусто. Жмите ❤️ на товарах — соберёте список и отправите его одним сообщением.
+            Пока пусто. Жмите ❤️ на товарах — соберёте список и одним нажатием перенесёте его в корзину.
           </div>
         )}
 
@@ -55,9 +54,7 @@ export default function FavPanel({ items, onOpen, onRemove, onClear, onClose, wa
         {!!items.length && (
           <div className="cart-foot">
             <div className="total">Итого: <b>{som(total)}</b> · {items.length} поз.</div>
-            <a className="add big wa-btn" href={wa(text)} target="_blank" rel="noreferrer">
-              Заказать всё в WhatsApp
-            </a>
+            <button className="add big" onClick={toCart}>Перенести всё в корзину</button>
             <div className="mini">
               <button className="danger" onClick={onClear}>Очистить список</button>
             </div>

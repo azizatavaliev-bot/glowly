@@ -2,10 +2,11 @@ import { useMemo, useState } from 'react'
 import type { Product } from '../types'
 import { cover } from '../photo'
 import { price, som, inStock } from '../pricing'
-import { split, full } from '../name'
+import { split } from '../name'
+import { useCart, openCart } from '../store'
 import { NEEDS } from '../needs'
 
-type Props = { all: Product[]; onOpen: (p: Product) => void; wa: (text: string) => string }
+type Props = { all: Product[]; onOpen: (p: Product) => void }
 
 const SKIN = [
   { key: 'oily', label: 'Жирная', emoji: '🫧', re: /SEBUM|MATTE|OIL CONTROL|GEL|LIGHT|WATER|ЖИРН|ГЕЛЬ|AZELAIC|TEA TREE|GREEN TEA|PORE/i },
@@ -48,7 +49,8 @@ function pickFor(all: Product[], stepIdx: number, skin: string, goal: string, of
   return scored[offset % scored.length].p
 }
 
-export default function RoutineBuilder({ all, onOpen, wa }: Props) {
+export default function RoutineBuilder({ all, onOpen }: Props) {
+  const cart = useCart()
   const [skin, setSkin] = useState('')
   const [goal, setGoal] = useState('')
   const [offsets, setOffsets] = useState<number[]>([0, 0, 0, 0, 0])
@@ -62,10 +64,7 @@ export default function RoutineBuilder({ all, onOpen, wa }: Props) {
   const total = routine.reduce((s, r) => s + (r.p ? price(r.p) : 0), 0)
   const swap = (i: number) => setOffsets(o => o.map((v, j) => (j === i ? v + 1 : v)))
 
-  const orderText = () => {
-    const lines = routine.filter(r => r.p).map(r => `${r.step.emoji} ${r.step.label}: ${full(r.p!)} — ${som(price(r.p!))}`)
-    return `Здравствуйте! Пишу с сайта LILO Cosmetics. Подобрала уход для ${SKIN.find(s => s.key === skin)?.label.toLowerCase()} кожи (${GOALS.find(g => g.key === goal)?.label.toLowerCase()}):\n\n${lines.join('\n')}\n\nИтого: ${som(total)}. Всё есть в наличии?`
-  }
+  const toCart = () => { routine.forEach(s => { if (s.p && !cart.qty(s.p.id)) cart.add(s.p.id) }); openCart() }
 
   return (
     <section className="routine" id="routine" data-reveal>
@@ -126,9 +125,7 @@ export default function RoutineBuilder({ all, onOpen, wa }: Props) {
                 <b>{som(total)}</b>
                 <i>{routine.filter(r => r.p).length} средств · хватит на 2–3 месяца</i>
               </div>
-              <a className="add big wa-btn" href={wa(orderText())} target="_blank" rel="noreferrer">
-                Заказать весь набор в WhatsApp
-              </a>
+              <button className="add big" onClick={toCart}>Добавить весь набор в корзину</button>
             </div>
           </div>
         )}

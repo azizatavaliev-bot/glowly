@@ -1,8 +1,8 @@
 import type { Product } from '../types'
 import { cover } from '../photo'
 import { price, cityPrice, saving, som, inStock } from '../pricing'
-import { split } from '../name'
-import { orderLink } from './ProductModal'
+import { split, expiry } from '../name'
+import BuyButton from './BuyButton'
 import { useFavorites } from '../store'
 import { toast } from './Toast'
 
@@ -36,6 +36,7 @@ export default function Card({ p, onOpen }: Props) {
         <h3 onClick={onOpen}>{title}</h3>
         {sub && <div className="sub" onClick={onOpen}>{sub}</div>}
         {p.spec && <div className="spec">{p.spec}</div>}
+        {expiry(p) && <div className="exp">годен {expiry(p)}</div>}
         <div className="row">
           <div className="price">
             {som(price(p))}
@@ -43,10 +44,7 @@ export default function Card({ p, onOpen }: Props) {
           </div>
         </div>
         <div className={stock ? 'stock in' : 'stock'}>{stock ? '● В наличии' : '○ Под заказ'}</div>
-        <a className="add wa-btn" href={orderLink(p)} target="_blank" rel="noreferrer"
-          onClick={e => e.stopPropagation()}>
-          {stock ? 'Заказать' : 'Заказать под заказ'}
-        </a>
+        <BuyButton p={p} />
       </div>
     </article>
   )

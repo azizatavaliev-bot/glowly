@@ -8,7 +8,7 @@ const RU = /[А-Яа-яЁё]/
 
 function human(s: string): string {
   const lower = s.toLowerCase()
-  return lower.charAt(0).toUpperCase() + lower.slice(1)
+  return (lower.charAt(0).toUpperCase() + lower.slice(1)).replace(/^Бб /, 'ББ-').replace(/№/g, '№ ')
 }
 
 // сокращения, которые в косметике принято писать капсом
@@ -19,6 +19,7 @@ const KEEP = new Set(['SPF', 'PA', 'PDRN', 'AHA', 'BHA', 'PHA', 'LHA', 'TXA', 'U
 function pretty(latin: string): string {
   return latin.split(' ').map(w => {
     if (/^\d+([.,]\d+)?(ML|G|EA|MG|PCS|P)\b/i.test(w)) return w.toLowerCase()      // объём и штуки
+    if (/^SPF|\/PA\+|^PA\+/i.test(w)) return w.toUpperCase()                     // SPF50+/PA++++
     const core = w.replace(/[^A-Za-z]/g, '')
     if (!core || KEEP.has(core.toUpperCase()) || /\d/.test(w) && core.length <= 3) return w
     return w.toLowerCase().replace(/(^|[-/&+.'(])([a-z])/g, (_, a, b) => a + b.toUpperCase())
@@ -43,4 +44,10 @@ export function split(p: Product): { title: string; sub: string } {
 export function full(p: Product): string {
   const { title, sub } = split(p)
   return sub ? `${title} ${sub}` : title
+}
+
+/** Срок годности из прайса («2027.04») в виде «до 04.2027» — покупатель должен видеть его до заказа. */
+export function expiry(p: Product): string | null {
+  const m = p.exp?.match(/^(\d{4})\.(\d{2})/)
+  return m ? `до ${m[2]}.${m[1]}` : null
 }
