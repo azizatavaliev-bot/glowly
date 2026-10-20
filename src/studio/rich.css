@@ -1,0 +1,121 @@
+/* ───── «богатый минимализм» для постов, обложек и сторис (17.10.2026) ─────
+ * Референсы — премиальные skincare-аккаунты: тёплые тона (крем, песок, какао), крупная антиква,
+ * подписи разрядкой капителью, товар на «подиуме» с мягким светом и тенью. Ни плашек, ни иконок. */
+@font-face { font-family: 'Cormorant'; src: url('/fonts/Cormorant.ttf') format('truetype'); font-weight: 300 700; font-display: block; }
+@font-face { font-family: 'Cormorant'; src: url('/fonts/Cormorant-Italic.ttf') format('truetype'); font-style: italic; font-weight: 300 700; font-display: block; }
+
+.m { --cream: #f3ede5; --sand: #e7dccd; --cocoa: #2a211b; --ink2: #2a211b; --mute2: #9b8d7e;
+  background: radial-gradient(120% 70% at 50% 42%, #faf6f0 0%, var(--cream) 55%, #ebe2d6 100%); color: var(--ink2); }
+.m em { font-family: 'Cormorant', serif; font-style: italic; font-weight: 400; color: #a5553d; }
+.m .lb, .m .br, .m .ft { font-family: Manrope, sans-serif; font-weight: 500; letter-spacing: .32em; text-transform: uppercase; color: var(--mute2); }
+.m .lb { font-size: 17px; } .m .br { font-size: 17px; } .m .ft { font-size: 16px; letter-spacing: .28em; }
+.m .lg-box .lg-serif b { font-family: 'Cormorant', serif; font-weight: 500; font-size: 54px; }
+.m h2, .m .tt, .m .qq, .m .pr { font-family: 'Cormorant', serif; font-weight: 500; letter-spacing: -.01em; }
+.m h2 { font-size: 92px; line-height: .98; }
+.m .tt { font-size: 66px; line-height: 1.02; margin-top: 14px; }
+.m .pr { font-size: 66px; }
+.m .qq { font-size: 96px; line-height: 1; }
+.m .qt { font-family: 'Cormorant', serif; font-style: italic; font-weight: 400; font-size: 80px; line-height: 1.12; }
+.m .aa { font-size: 32px; color: #6f6357; }
+/* товар на подиуме: мягкий свет сзади и тень на «полу» */
+.m .ph::before { content: ''; position: absolute; left: 12%; right: 12%; bottom: 2%; height: 9%; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(70, 50, 35, .22), transparent); filter: blur(6px); }
+.m .ph::after { content: ''; position: absolute; inset: 6% 14%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,255,255,.75), transparent); z-index: 0; }
+.m .ph img { z-index: 1; } .m img.cut { filter: drop-shadow(0 24px 30px rgba(60, 40, 25, .14)); }
+.m .ln, .m .it { border-color: rgba(42, 33, 27, .14); } .m .it:last-child { border-bottom-color: rgba(42, 33, 27, .14); }
+.m .it > i { font-family: 'Cormorant', serif; font-size: 54px; color: #a5553d; }
+.m .ln b, .m .it b, .m .g4 p span { font-family: 'Cormorant', serif; font-size: 36px; font-weight: 500; color: var(--ink2); }
+.m .g4 p { font-size: 21px; } .m .g4 p span { font-size: 30px; }
+
+/* тона по типам: чередование крем / песок / какао делает ленту живой */
+.m.t-подборка, .m.t-уход { background: radial-gradient(120% 70% at 50% 40%, #f1e8dc 0%, var(--sand) 60%, #ddcfbe 100%); }
+.m.t-совет { background: radial-gradient(120% 80% at 50% 30%, #3a2e25 0%, var(--cocoa) 60%, #1d1712 100%); color: #f3ede5; }
+.m.t-совет .qt { color: #f3ede5; } .m.t-совет .lg-serif b { color: #f3ede5; }
+.m.t-совет .ln { border-color: rgba(243, 237, 229, .18); } .m.t-совет .ln b, .m.t-совет .ln p { color: #f3ede5; }
+.m.t-совет .ph::before, .m.t-совет .ph::after { display: none; }
+
+/* обложки рилсов и сторис актуального */
+.m.reel .r-top { font-family: Manrope, sans-serif; font-size: 26px; letter-spacing: .32em; text-transform: uppercase; color: var(--mute2); }
+.m.reel .r-big { font-family: 'Cormorant', serif; font-weight: 500; font-size: 136px; line-height: .95; letter-spacing: -.015em; }
+.m.hs .hs-top { font-family: Manrope, sans-serif; font-size: 26px; letter-spacing: .32em; text-transform: uppercase; color: var(--mute2); }
+.m.hs .hs-big, .m.hs .hs-h { font-family: 'Cormorant', serif; font-weight: 500; font-size: 128px; line-height: .96; letter-spacing: -.015em; }
+.m.hs .hs-list, .m.hs .hs-steps, .m.hs .hs-p { font-size: 40px; }
+.m.hs .hs-list li, .m.hs .hs-steps li, .m.hs .hs-tiers div, .m.hs .hs-pt > div { border-color: rgba(42, 33, 27, .14); }
+.m.hs .hs-tiers div { font-family: 'Cormorant', serif; font-size: 64px; } .m.hs .hs-tiers b { font-family: Manrope, sans-serif; font-size: 34px; font-weight: 500; letter-spacing: .1em; }
+.m.hs .hs-nums b { font-family: 'Cormorant', serif; font-size: 160px; }
+.m.hs .hs-g4 u, .m.hs .hs-pt b { font-family: 'Cormorant', serif; font-size: 50px; font-weight: 500; }
+.m.hs .hs-steps li::before { font-family: 'Cormorant', serif; font-size: 80px; }
+.m.hs.dark { background: radial-gradient(120% 80% at 50% 30%, #3a2e25 0%, var(--cocoa) 60%, #1d1712 100%); color: #f3ede5; }
+.m.hs.dark .lg-serif b, .m.hs.dark .hs-big, .m.hs.dark li { color: #f3ede5; }
+.m.hs.dark .hs-list li, .m.hs.dark .hs-tiers div { border-color: rgba(243, 237, 229, .18); }
+.m.hs.sand { background: radial-gradient(120% 70% at 50% 40%, #f1e8dc 0%, var(--sand) 60%, #ddcfbe 100%); }
+/* у Cormorant по умолчанию «старинные» цифры разной высоты — для цен нужны ровные */
+.m, .m * { font-variant-numeric: lining-nums; }
+.m.hs .hs-one { margin-bottom: 40px; } .m.hs .hs-one .ph { flex: 1 1 0; min-height: 0; position: relative; }
+.m.hs .hs-pt > div { padding: 18px 0; }
+.m.hs.dark .hs-p { color: #cbbfb2; }
+
+/* подборка и уход: один товар крупно, остальные — строкой (правило «один продукт в кадре») */
+.m .ph.pk-hero { margin: 40px 0 32px; flex: 1 1 0; min-height: 0; }
+.m .pk-list { list-style: none; margin: 0 0 40px; padding: 0; }
+.m .pk-list li { display: flex; align-items: baseline; gap: 24px; padding: 14px 0; border-top: 1px solid rgba(42, 33, 27, .14); color: #8f8274; }
+.m .pk-list li.on { color: var(--ink2); }
+.m .pk-list i { font-family: 'Cormorant', serif; font-style: italic; font-size: 34px; color: #a5553d; width: 40px; }
+.m .pk-list span { flex: 1; font-size: 25px; line-height: 1.25; } .m .pk-list small { display: block; font-size: 14px; letter-spacing: .28em; text-transform: uppercase; color: var(--mute2); }
+.m .pk-list b { font-family: 'Cormorant', serif; font-size: 34px; font-weight: 500; }
+/* «живое»: мягкая тень листьев, как от солнца из окна — приём премиальных skincare-съёмок */
+.m::before { content: ''; position: absolute; right: -140px; top: -120px; width: 760px; height: 760px; pointer-events: none; z-index: 0; opacity: .16; filter: blur(14px); transform: rotate(-18deg);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cg fill='%233b2a1d'%3E%3Cellipse cx='60' cy='40' rx='12' ry='38' transform='rotate(30 60 40)'/%3E%3Cellipse cx='110' cy='60' rx='11' ry='34' transform='rotate(-20 110 60)'/%3E%3Cellipse cx='150' cy='110' rx='13' ry='40' transform='rotate(50 150 110)'/%3E%3Cellipse cx='90' cy='120' rx='10' ry='30' transform='rotate(-40 90 120)'/%3E%3Cpath d='M20 10 Q100 90 190 190' stroke='%233b2a1d' stroke-width='3' fill='none'/%3E%3C/g%3E%3C/svg%3E") no-repeat center / contain; }
+.m > * { position: relative; z-index: 1; }
+.m.t-совет::before, .m.hs.dark::before { opacity: .35; filter: blur(16px) invert(1); }
+
+/* вместо цены — призыв на сайт */
+.m .cta { font-family: 'Cormorant', serif; font-style: italic; font-size: 40px; line-height: 1.1; text-align: right; color: #a5553d; }
+.m .cta span { display: block; font-family: Manrope, sans-serif; font-style: normal; font-size: 16px; letter-spacing: .3em; text-transform: uppercase; color: var(--mute2); margin-top: 10px; }
+.m.hs .hs-cta { margin-top: 36px; font-family: 'Cormorant', serif; font-size: 64px; line-height: 1.05; }
+.m.hs .hs-cta span { display: block; font-family: Manrope, sans-serif; font-size: 30px; letter-spacing: .1em; color: var(--mute2); margin-top: 20px; }
+.m.t-совет .ln p { margin-right: 0; }
+
+/* ───── «вау»-люкс (17.10.2026): меньше товара, больше воздуха, центральная симметрия ───── */
+.m::before { opacity: .09; }
+.m .ph::after { inset: 14% 24%; }
+.m .lux { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.m .lux-ph { position: relative; width: 420px; height: 520px; margin-bottom: 64px; }
+.m .lux-ph img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.m .lux-ph::before { content: ''; position: absolute; left: 18%; right: 18%; bottom: -18px; height: 34px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(70, 50, 35, .2), transparent); filter: blur(5px); }
+.m .lux .br { font-size: 15px; letter-spacing: .42em; }
+.m .lux-name { font-family: 'Cormorant', serif; font-weight: 400; font-size: 64px; line-height: 1.05; letter-spacing: -.005em; margin-top: 18px; max-width: 760px; }
+.m .lux-type { font-size: 20px; color: var(--mute2); margin-top: 16px; letter-spacing: .02em; }
+.m .lux-cta { text-align: center; font-family: 'Cormorant', serif; font-size: 30px; color: #6f6357; margin: 32px 0 40px; }
+.m .lux-cta em { font-size: 32px; }
+.m.t-товар .hd .lb { letter-spacing: .4em; }
+/* подборка, уход, совет, вопрос — тоже сдержаннее */
+.m .ph.pk-hero { flex: 0 0 360px; margin: 48px auto 40px; width: 340px; }
+.m h2 { font-weight: 400; font-size: 84px; }
+.m .pk-list span { font-size: 22px; } .m .pk-list li { padding: 12px 0; }
+.m .qt { font-size: 70px; text-align: center; margin-left: 40px; margin-right: 40px; }
+.m.t-совет .qt { margin-top: auto; }
+.m .qq { font-weight: 400; font-size: 84px; }
+.m .ln .th { width: 72px; height: 72px; }
+/* обложки рилсов и сторис: товар меньше, заголовок по центру */
+.m.reel { text-align: center; }
+.m.reel .hd { text-align: left; }
+.m.reel .r-big { font-weight: 400; font-size: 120px; }
+.m.reel .ph { flex: 0 0 640px; margin: 80px 200px 0; }
+.m.reel .ft { text-align: left; }
+.m.hs { text-align: left; }
+.m.hs .hs-one { align-items: center; text-align: center; }
+.m.hs .hs-one .ph { flex: 0 0 760px; width: 560px; }
+.m.hs .hs-one .tt { font-family: 'Cormorant', serif; font-weight: 400; font-size: 72px; margin: 18px 0 0; }
+.m.hs .hs-cta { font-size: 48px; margin-top: 48px; }
+.m.hs .hs-big, .m.hs .hs-h { font-weight: 400; }
+.m.hs .hs-top[style] { text-align: center; }
+/* рилсы: в сетке профиля видна середина 9:16 — товар держим небольшим, иначе плитка перегружена */
+.m.m.reel .ph { flex: 0 0 520px; margin: 90px 230px 0; }
+.m.m.reel .r-big { font-size: 104px; }
+/* широкие коробки и банки визуально тяжелее флаконов — даём им меньше места по ширине */
+.m .lux-ph { width: 380px; height: 480px; }
+
+/* шахматка ленты: посты — песок (совет — какао), рилсы — крем */
+.tone-dark .m:not(.t-совет) { background: radial-gradient(120% 70% at 50% 40%, #f1e8dc 0%, #e7dccd 60%, #ddcfbe 100%); }

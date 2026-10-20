@@ -1,0 +1,89 @@
+/* ───── превью профиля Instagram /feed ───── */
+.fd { display: flex; gap: 48px; justify-content: center; align-items: flex-start; padding: 40px 24px; background: #efebe6; min-height: 100vh; }
+.fd em { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 500; color: var(--acc); }
+.fd-side { width: 300px; position: sticky; top: 40px; }
+.fd-side .lg-serif b { font-size: 40px; }
+.fd-side h1 { font-size: 32px; font-weight: 600; margin: 20px 0 10px; letter-spacing: -.02em; }
+.fd-side p { font-size: 14px; color: #5d564f; margin: 0 0 10px; }
+.fd-legend { display: flex; flex-direction: column; gap: 4px; font-size: 13px; background: #fff; border-radius: 14px; padding: 16px; margin: 16px 0; }
+.fd-legend b { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--mut); margin-bottom: 4px; }
+.fd-links { display: flex; gap: 16px; font-size: 14px; } .fd-links a { color: var(--acc); }
+.fd-phone { width: 390px; background: #fff; border-radius: 36px; box-shadow: 0 0 0 10px #16130f; overflow: hidden; color: #111; font-family: -apple-system, 'Helvetica Neue', sans-serif; }
+.ig-top { display: flex; justify-content: space-between; padding: 18px 16px 8px; font-size: 18px; }
+.ig-head { display: flex; align-items: center; gap: 24px; padding: 8px 16px; }
+.ig-ava { width: 82px; height: 82px; border-radius: 50%; background: #f7f4f0; display: grid; place-items: center; border: 1px solid #e3ddd5; flex: none; }
+.ig-ava .lg-serif b { font-size: 30px; }
+.ig-stats { display: flex; flex: 1; justify-content: space-around; text-align: center; font-size: 13px; }
+.ig-stats b { display: block; font-size: 17px; }
+.ig-bio { padding: 6px 16px; font-size: 13.5px; line-height: 1.4; white-space: pre-line; }
+.ig-bio b { display: block; } .ig-bio a { color: #00376b; font-weight: 600; }
+.ig-btns { display: flex; gap: 6px; padding: 8px 16px; } .ig-btns span { flex: 1; text-align: center; background: #efefef; border-radius: 8px; padding: 7px 0; font-size: 13px; font-weight: 600; }
+.ig-hl { display: flex; gap: 14px; padding: 10px 16px; font-size: 11.5px; text-align: center; }
+.ig-hl div { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.ig-hl i { width: 60px; height: 60px; border-radius: 50%; border: 1px solid #ddd; background: #f7f4f0; display: grid; place-items: center; }
+.ig-hl .lg-serif b { font-size: 20px; }
+.ig-tabs { display: flex; border-top: 1px solid #eee; } .ig-tabs button { flex: 1; border: 0; background: none; padding: 10px; font-size: 13px; color: #999; border-bottom: 1px solid transparent; }
+.ig-tabs button.on { color: #111; border-bottom-color: #111; }
+.ig-grid { display: grid; grid-template-columns: repeat(3, 129px); gap: 1.5px; justify-content: center; }
+.ig-grid button { border: 0; padding: 0; background: none; cursor: pointer; }
+.ig-grid button:hover { opacity: .85; }
+.fd-reel { position: absolute; right: 6px; top: 5px; color: #fff; font-size: 12px; text-shadow: 0 0 3px rgba(0,0,0,.6); }
+.ig-feed article { border-bottom: 1px solid #eee; padding-bottom: 12px; }
+.ig-post-h { display: flex; align-items: center; gap: 8px; padding: 10px 12px; font-size: 13px; }
+.ig-post-h i { width: 32px; height: 32px; border-radius: 50%; background: #f7f4f0; border: 1px solid #e3ddd5; display: grid; place-items: center; }
+.ig-post-h .lg-serif b { font-size: 13px; } .ig-post-h span { margin-left: auto; color: #999; font-size: 12px; }
+.ig-cap { padding: 8px 12px 0; font-size: 13.5px; line-height: 1.4; white-space: pre-line; }
+.fd-modal { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: grid; place-items: center; z-index: 100; }
+.fd-card { display: flex; background: #fff; border-radius: 8px; overflow: hidden; max-width: 900px; }
+.fd-meta { width: 380px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+.fd-date { font-size: 12px; font-weight: 700; color: var(--acc); letter-spacing: .04em; }
+.fd-meta pre { white-space: pre-wrap; font: 14px/1.5 Manrope, sans-serif; margin: 0; flex: 1; }
+.fd-nav { display: flex; gap: 8px; } .fd-nav button { flex: 1; border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 10px; }
+.fd-nav button:disabled { opacity: .35; }
+.fd-note { font-size: 12px; color: var(--mut); margin: 0; }
+.fd-hl { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 4px 0 10px; }
+.fd-hl div { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; }
+.fd-dl { border: 0; background: var(--ink); color: #fff; border-radius: 10px; padding: 10px; font-weight: 600; font-size: 13px; }
+.fd-dl:disabled { opacity: .5; }
+.fd-bio { white-space: pre-wrap; font: 13px/1.5 -apple-system, sans-serif; margin: 0 0 8px; }
+.fd-hl-src { position: fixed; left: -99999px; top: 0; }
+.ig-hl { overflow-x: auto; } .ig-hl i { border: 0; background: none; }
+
+/* сторис «актуального» 1080×1920 */
+.m.hs .hs-mid { margin: auto 0; }
+.m.hs .hs-top { font-size: 40px; color: #9a9188; }
+.m.hs .hs-big { font-size: 96px; font-weight: 600; line-height: 1.04; letter-spacing: -.035em; margin: 20px 0 0; }
+.m.hs .hs-h { font-size: 88px; font-weight: 600; letter-spacing: -.03em; margin: 110px 0 0; line-height: 1.05; }
+.m.hs .hs-list, .m.hs .hs-steps { margin: 72px 0 0; padding: 0; list-style: none; font-size: 42px; line-height: 1.35; }
+.m.hs .hs-list li, .m.hs .hs-steps li { padding: 26px 0; border-top: 2px solid #e3ddd5; }
+.m.hs .hs-steps { counter-reset: s; } .m.hs .hs-steps li { counter-increment: s; display: flex; gap: 32px; }
+.m.hs .hs-steps li::before { content: counter(s); font-family: 'Playfair Display', serif; font-style: italic; color: #c0563c; font-size: 64px; line-height: .9; width: 40px; flex: none; }
+.m.hs .hs-tiers { margin-top: 72px; } .m.hs .hs-tiers div { display: flex; justify-content: space-between; align-items: baseline; padding: 34px 0; border-top: 2px solid #e3ddd5; font-size: 52px; }
+.m.hs .hs-tiers b { font-weight: 500; color: #c0563c; }
+.m.hs .hs-p { font-size: 44px; line-height: 1.45; color: #5d564f; margin: 56px 0 0; }
+.m.hs .hs-note { font-size: 32px; color: #b3aaa0; border: 2px dashed #d6cec5; border-radius: 24px; padding: 28px; }
+.m.hs .hs-nums { display: flex; gap: 72px; margin-top: 72px; font-size: 36px; color: #9a9188; }
+.m.hs .hs-nums b { display: block; font-size: 110px; font-weight: 500; color: #16130f; line-height: 1; }
+.m.hs .hs-btn { margin-top: 72px; align-self: flex-start; display: inline-block; border: 3px solid #16130f; border-radius: 80px; padding: 28px 56px; font-size: 44px; }
+.m.hs .hs-g4 { display: grid; grid-template-columns: 1fr 1fr; gap: 56px 48px; margin: 72px 0 48px; flex: 1 1 0; min-height: 0; grid-template-rows: minmax(0,1fr) minmax(0,1fr); }
+.m.hs .hs-g4 > div { display: flex; flex-direction: column; min-height: 0; }
+.m.hs .hs-g4 .ph { margin: 0 0 20px; flex: 1 1 0; min-height: 0; position: relative; }
+.m.hs .hs-g4 b { font-size: 24px; letter-spacing: .2em; color: #9a9188; font-weight: 500; }
+.m.hs .hs-g4 p { font-size: 32px; margin: 6px 0 0; line-height: 1.25; }
+.m.hs .hs-g4 u { text-decoration: none; font-size: 40px; margin-top: 10px; }
+.m.hs .hs-one { display: flex; flex-direction: column; flex: 1; min-height: 0; margin-top: 40px; }
+.m.hs .hs-one .tt { font-size: 60px; margin-bottom: 40px; }
+.m.hs .hs-pt > div { display: flex; justify-content: space-between; padding: 26px 0; border-top: 2px solid #e3ddd5; font-size: 42px; }
+.m.hs .hs-pt b { font-weight: 500; } .m.hs .hs-pt .rt { color: #9a9188; }
+/* просмотр сторис в телефоне */
+.st-view { position: fixed; inset: 0; background: rgba(0,0,0,.85); display: flex; align-items: center; justify-content: center; gap: 24px; z-index: 120; }
+.st-box { position: relative; width: 405px; height: 720px; border-radius: 14px; overflow: hidden; }
+.st-bars { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; gap: 4px; z-index: 2; }
+.st-bars i { flex: 1; height: 3px; border-radius: 2px; background: rgba(0,0,0,.15); } .st-bars i.on { background: #16130f; }
+.st-tap { position: absolute; inset: 0; display: flex; z-index: 3; } .st-tap button { flex: 1; border: 0; background: none; cursor: pointer; }
+.st-side { color: #fff; width: 220px; font-size: 14px; display: flex; flex-direction: column; gap: 10px; }
+.st-side b { font-size: 20px; } .st-side button { border: 0; border-radius: 10px; padding: 10px; font-weight: 600; background: #fff; }
+.ig-hl button { border: 0; background: none; padding: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11.5px; width: 64px; flex: none; }
+.ig-hl { gap: 10px; } .ig-hl button span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 64px; }
+.ig-name { font-weight: 700; } .ig-cat { color: #737373; display: block; }
+.fd-tip { font-size: 12px; color: var(--mut); margin: 8px 0 0; }

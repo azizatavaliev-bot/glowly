@@ -35,9 +35,11 @@ def main() -> None:
     for f in sorted((ROOT / "scripts").glob("photos_new.*.json")):
         found.update(json.loads(f.read_text(encoding="utf-8")))
 
+    # товары, где автопоиск уже ошибался (смотрели глазами), — фото им не даём, пусть остаётся превью
+    reject = set(json.loads((ROOT / "scripts/photo_reject.json").read_text())["ids"])
     rows = []
     for p in data["products"]:
-        if p.get("photos"):
+        if p.get("photos") or p["id"] in reject:
             continue
         shots = [s for s in found.get(f'{p["brand"]}|{p["name"]}', []) if (PHOTOS / s).exists()]
         if not shots:

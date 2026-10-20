@@ -4,6 +4,7 @@ import { cover } from '../photo'
 import { price, som } from '../pricing'
 import { split } from '../name'
 import { matches, score } from '../search'
+import { OPT, OPT_MIN } from '../mode'
 
 type Props = {
   all: Product[]
@@ -18,7 +19,9 @@ type Props = {
 }
 
 // слово в заголовке меняется — три причины купить за один взгляд
-const WORDS = ['по супер-ценам', 'в удобном каталоге', 'прямо из Кореи', 'с доставкой сегодня']
+const WORDS = OPT
+  ? ['оптом из наличия', 'по оптовым ценам', 'для салонов и магазинов']
+  : ['по супер-ценам', 'в удобном каталоге', 'прямо из Кореи', 'с доставкой сегодня']
 
 /** Число «набегает» от нуля при появлении — так цифры читаются, а не пролистываются. */
 function useCountUp(target: number, ms = 1100): number {
@@ -78,7 +81,7 @@ export default function Hero({ all, total, brands, columns, hits: topHits, onSta
 
       <div className="wrap hero-in">
         <div className="hero-txt">
-          <span className="pill"><i /> Доставка по Бишкеку · оплата при получении</span>
+          <span className="pill"><i /> {OPT ? `Оптовые цены · заказ от ${som(OPT_MIN)}` : 'Доставка по Бишкеку · оплата при получении'}</span>
           <h1>
             Корейская косметика<br />
             <span className="swap">
@@ -89,11 +92,14 @@ export default function Hero({ all, total, brands, columns, hits: topHits, onSta
           </h1>
           <p>
             <span className="only-wide">
-              Удобный каталог корейской косметики с супер-ценами: {total} товаров
-              от {brands} брендов, все в наличии. Выбираете за пару минут — привозим за день.
+              {OPT
+                ? `Оптовый каталог: ${total} товаров от ${brands} брендов, всё в наличии в Бишкеке. Собираете заказ в корзине — отправляете одним сообщением.`
+                : `Удобный каталог корейской косметики с супер-ценами: ${total} товаров от ${brands} брендов, все в наличии. Выбираете за пару минут — привозим за день.`}
             </span>
             <span className="only-narrow">
-              Удобный каталог с супер-ценами. {total} товаров в наличии, доставка за день.
+              {OPT
+                ? `Оптовые цены на ${total} товаров из наличия. Заказ от ${som(OPT_MIN)}.`
+                : `Удобный каталог с супер-ценами. ${total} товаров в наличии, доставка за день.`}
             </span>
           </p>
 

@@ -4,6 +4,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --ignore-scripts
 COPY . .
+# VITE_OPT=1 — сборка оптового сайта (отдельный сервис Railway)
+ARG VITE_OPT
+ENV VITE_OPT=$VITE_OPT
 RUN npm run build
 
 FROM nginx:1.27-alpine

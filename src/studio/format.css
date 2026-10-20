@@ -1,0 +1,48 @@
+/* ───── страница формата контента /format ───── */
+.fm { max-width: 1320px; margin: 0 auto; padding: 48px 40px 80px; background: #fbf9f6; min-height: 100vh; }
+.fm em { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 500; color: var(--acc); }
+.fm a { color: var(--acc); }
+.fm-head { display: flex; gap: 40px; align-items: flex-start; padding-bottom: 32px; border-bottom: 1px solid var(--line); }
+.fm-head .lg { width: auto; } .fm-head .lg-serif b { font-size: 44px; }
+.fm-head h1 { margin: 0; font-size: 40px; font-weight: 600; letter-spacing: -.02em; }
+.fm-head p { margin: 8px 0 0; color: var(--mut); max-width: 640px; }
+.fm-sec { padding: 40px 0; border-bottom: 1px solid var(--line); }
+.fm-sec > h2 { font-size: 24px; font-weight: 600; margin: 0 0 16px; letter-spacing: -.01em; }
+.fm-lead { color: #5d564f; max-width: 760px; margin: 0 0 20px; }
+.fm-rules { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.fm-rules > div { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+.fm-rules b { display: block; margin-bottom: 6px; } .fm-rules span { font-size: 14px; color: #5d564f; }
+.fm-brand { display: grid; grid-template-columns: 1fr 1.4fr 1.2fr; gap: 16px; }
+.fm-card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+.fm-card > p { font-size: 14px; color: #5d564f; margin: 14px 0 0; }
+.fm-k { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--mut); }
+.fm-logo { padding: 18px 0 4px; } .fm-logo .lg-serif b { font-size: 56px; }
+.fm-sw { display: flex; gap: 12px; margin-top: 14px; }
+.fm-sw div { display: flex; flex-direction: column; gap: 3px; font-size: 12px; }
+.fm-sw i { width: 56px; height: 56px; border-radius: 12px; border: 1px solid var(--line); }
+.fm-sw span { color: var(--mut); }
+.fm-type { display: flex; flex-direction: column; gap: 6px; margin-top: 14px; }
+.fm-mini { overflow: hidden; border-radius: 6px; flex: none; box-shadow: 0 0 0 1px var(--line); background: #f7f4f0; }
+.fm-grid { display: grid; grid-template-columns: repeat(3, 240px); gap: 4px; }
+.fm-types { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
+.fm-type-card > b { display: block; margin-top: 12px; font-size: 16px; }
+.fm-type-card > p { margin: 4px 0; font-size: 13.5px; color: #5d564f; }
+.fm-type-card > span { font-size: 12px; font-weight: 700; color: var(--acc); }
+.fm-row { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; }
+.fm-week { border-collapse: collapse; width: 100%; max-width: 760px; margin-bottom: 16px; }
+.fm-week td { padding: 12px 10px; border-bottom: 1px solid var(--line); }
+.fm-week td:first-child { font-weight: 700; width: 50px; }
+.fm-tag { font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; background: #efeae4; }
+.fm-tag.опт { background: #16130f; color: #fff; } .fm-tag.товар { background: var(--acc-soft); color: var(--acc); }
+.fm-foot { padding-top: 32px; color: var(--mut); }
+/* 9:16 — обложка рилса и сторис */
+.m.reel { height: 1920px; padding: 120px 96px 140px; }
+.m.reel .r-top { font-size: 40px; color: #9a9188; margin-top: 230px; letter-spacing: .02em; }
+.m.reel .r-big { font-size: 104px; font-weight: 600; line-height: 1.02; letter-spacing: -.035em; margin-top: 16px; }
+.m.reel .ph { margin: 60px 0; flex: 0 0 760px; }
+.m.reel .ft { margin-top: auto; }
+.m.story .tt { font-size: 64px; } .m.story .br { margin-top: 0; }
+.m.story .s-prices { display: flex; gap: 48px; margin-top: 40px; font-size: 32px; color: #9a9188; }
+.m.story .s-prices b { display: block; font-size: 64px; color: #16130f; font-weight: 500; }
+.m.story .s-link { margin-top: 64px; align-self: flex-start; border: 2px solid #16130f; border-radius: 60px; padding: 22px 40px; font-size: 34px; }
+@media (max-width: 900px) { .fm-rules, .fm-brand, .fm-types { grid-template-columns: 1fr 1fr; } .fm-grid { grid-template-columns: repeat(3, 1fr); } }

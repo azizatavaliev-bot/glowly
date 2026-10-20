@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { OPT } from './mode'
 
 /** Список id в localStorage, реактивный между компонентами через событие окна. */
 function useIdList(key: string, max = 100): [number[], (id: number) => void, (id: number) => void, () => void] {
@@ -42,7 +43,8 @@ export function useRecent() {
 /* ───────── корзина ───────── */
 
 type CartState = { items: Record<number, number>; order: string | null }
-const CART_KEY = 'lilo.cart'
+// у опта своя корзина: розничный и оптовый заказ не должны смешиваться
+const CART_KEY = OPT ? 'lilo.cart.opt' : 'lilo.cart'
 
 function readCart(): CartState {
   try {
@@ -60,7 +62,7 @@ function readCart(): CartState {
 function newOrderNo(): string {
   const d = new Date()
   const pad = (n: number) => String(n).padStart(2, '0')
-  return `L${pad(d.getDate())}${pad(d.getMonth() + 1)}-${Math.floor(1000 + Math.random() * 9000)}`
+  return `${OPT ? 'LO' : 'L'}${pad(d.getDate())}${pad(d.getMonth() + 1)}-${Math.floor(1000 + Math.random() * 9000)}`
 }
 
 function writeCart(next: CartState) {

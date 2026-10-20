@@ -6,7 +6,7 @@ import openpyxl
 from PIL import Image
 import io
 
-SRC = sys.argv[1] if len(sys.argv) > 1 else str(Path.home() / "Desktop/прайс по наличию 29,09.xlsx")
+SRC = sys.argv[1] if len(sys.argv) > 1 else str(Path.home() / "Desktop/Прайс 15.10 Бишкек.xlsx")
 ROOT = Path(__file__).resolve().parent.parent
 IMG_DIR = ROOT / "public/img"
 IMG_DIR.mkdir(parents=True, exist_ok=True)
@@ -70,8 +70,20 @@ products, brand = [], None
 sale = None
 skip = False
 seen = set()
+# порядок колонок у склада меняется (15.10 пропала «Единица измерения»), поэтому берём их по заголовкам строк 4–5
+COL = {}
+for r in (4, 5):
+    for c, v in enumerate(next(ws.iter_rows(min_row=r, max_row=r, values_only=True))):
+        if v: COL.setdefault(str(v).strip(), c)
+def cell(row, title, default=None):
+    c = COL.get(title)
+    return row[c] if c is not None and c < len(row) else default
+# дата прайса из шапки: «Дата: 15 октября 2026 г.»
+price_date = next((str(r[5]).replace("\xa0г.", "").replace(" г.", "").strip() for r in ws.iter_rows(min_row=2, max_row=2, values_only=True) if r[5]), "")
+
 for i, row in enumerate(ws.iter_rows(min_row=6, values_only=True), start=6):
-    name, spec, _f, unit, barcode, pack, price, *_ = row
+    name, spec = row[0], row[1]
+    unit, barcode, pack, price = cell(row, "Единица измерения"), cell(row, "Штрихкод"), cell(row, "Информация об упаковке"), cell(row, "Цена")
     if not name: continue
     name = str(name).strip()
     p = num(price)
@@ -129,7 +141,7 @@ have = {p["id"] for p in products}
 products += [p for p in prev if p["id"] in KEEP and p["id"] not in have]
 assert len({p["id"] for p in products}) == len(products), "дубли id"
 
-meta = {"currency": "USD", "date": "29 сентября 2026", "site": "www.korshop.one", "contact": "+996-559-050-618"}
+meta = {"currency": "USD", "date": price_date, "site": "www.korshop.one", "contact": "+996-559-050-618"}
 out = ROOT / "src/data"
 out.mkdir(parents=True, exist_ok=True)
 (out / "products.json").write_text(json.dumps({"meta": meta, "products": products}, ensure_ascii=False, indent=1), encoding="utf-8")

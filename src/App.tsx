@@ -27,6 +27,7 @@ const all = (data.products as Product[]).filter(inStock)
 
 import { BRAND_FULL, waLink } from './brand'
 import Logo from './components/Logo'
+import { OPT, OPT_MIN } from './mode'
 
 // фильтры из адреса читаем сразу при старте: эффект записи в адрес иначе успевает их стереть
 const fromUrl = (k: string) => new URLSearchParams(location.search).get(k)
@@ -181,6 +182,19 @@ export default function App() {
   useEffect(() => { setLimit(48) }, [q, cat, brand, sort, onlySale, need, maxPrice])
   useReveal([list, limit])
 
+  // товары догружаются сами, когда покупатель долистал до конца списка
+  const moreRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    // по событию прокрутки, а не IntersectionObserver: при резком пролистывании метка проскакивает экран незамеченной
+    const check = () => {
+      const el = moreRef.current
+      if (el && el.getBoundingClientRect().top < window.innerHeight + 800) setLimit(l => l + 24)
+    }
+    check()
+    window.addEventListener('scroll', check, { passive: true })
+    return () => window.removeEventListener('scroll', check)
+  }, [list, limit])
+
   const toCatalog = () => catalogRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   const pickBrand = (b: string) => { setBrand(b); setCat('Все'); toCatalog() }
 
@@ -191,6 +205,7 @@ export default function App() {
           <button className="logo" aria-label={BRAND_FULL} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
             <Logo />
           </button>
+          {OPT && <span className="opt-tag">опт</span>}
           <button className="top-search" onClick={() => {
             const el = document.querySelector<HTMLInputElement>('.catalog .search')
             el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -219,16 +234,37 @@ export default function App() {
 
       <Marquee items={brands.slice(1)} onPick={pickBrand} />
 
-      <section className="perks" data-reveal>
-        <div className="wrap perks-in">
-          <div><b>🇰🇷 Оригинал из Кореи</b><span>Везём напрямую со склада, без перекупов</span></div>
-          <div><b>💸 Дешевле города</b><span>Цены ниже магазинных — сравнение в каждой карточке</span></div>
-          <div><b>🚚 Доставка по Бишкеку</b><span>Привезём день в день, оплата при получении</span></div>
-          <div><b>💬 Подберём уход</b><span>Напишите в WhatsApp — поможем выбрать под вашу кожу</span></div>
-        </div>
-      </section>
+      {OPT && (
+        <section className="opt-terms" data-reveal>
+          <div className="wrap">
+            <h2 className="sec-title">Условия <em>опта</em></h2>
+            <div className="ot-grid">
+              <div className="ot-tiers">
+                <b>Оптовая цена</b>
+                <div className="ot-tier"><span>от 15 000 с</span><i>одна цена на весь заказ</i></div>
+                <p>Все оптовые цены — в каталоге ниже. Минимальный заказ — 15 000 с в сумме.</p>
+              </div>
+              <div><b>Без коробов</b><span>Берите любой набор позиций от {som(OPT_MIN)} — не нужно закупать по 48 штук одного товара.</span></div>
+              <div><b>Из наличия в Бишкеке</b><span>{all.length} позиций и {brands.length - 1} брендов на складе — то, что видите на сайте, можно забрать сейчас.</span></div>
+              <div><b>Оригиналы из Кореи</b><span>Корейская маркировка, штрихкоды, свежие сроки годности.</span></div>
+              <div><b>Заказ за 2 минуты</b><span>Соберите корзину на сайте → «Отправить заказ» → менеджер подтвердит в WhatsApp.</span></div>
+            </div>
+          </div>
+        </section>
+      )}
 
-      {!!sales.length && (
+      {!OPT && <section className="perks" data-reveal>
+        <div className="wrap perks-in">
+          <div><b>Оригинал из Кореи</b><span>Везём напрямую со склада, без перекупов</span></div>
+          {OPT
+            ? <div><b>Оптовые цены</b><span>Ниже нашей розницы — разница видна в каждой карточке</span></div>
+            : <div><b>Дешевле города</b><span>Цены ниже магазинных — сравнение в каждой карточке</span></div>}
+          <div><b>Доставка по Бишкеку</b><span>Привезём день в день, оплата при получении</span></div>
+          <div><b>Подберём уход</b><span>Напишите в WhatsApp — поможем выбрать под вашу кожу</span></div>
+        </div>
+      </section>}
+
+      {!OPT && !!sales.length && (
         <section className="sales" data-reveal>
           <div className="wrap sales-head">
             <h2>Скидки <em>недели</em></h2>
@@ -266,8 +302,6 @@ export default function App() {
           </div>
         </div>
       </section>
-
-      <RoutineBuilder all={all} onOpen={setOpen} />
 
       <div className="catalog" ref={catalogRef} id="catalog">
         <div className="wrap">
@@ -312,13 +346,19 @@ export default function App() {
                   onClick={() => setQ(q === h ? '' : h)}>{h}</button>
               ))}
             </div>
-            <div className="cats">
-              {cats.map(c => (
-                <button key={c} className={c === cat ? 'chip on' : 'chip'} onClick={() => setCat(c)}>
-                  {c}<i>{c === 'Все' ? all.length : all.filter(p => p.cat === c).length}</i>
-                </button>
-              ))}
-            </div>
+          </div>
+        </div>
+
+        {/* категории едут вместе с экраном, как в приложении магазина: сменить раздел можно с любого места */}
+        <div className="cats-bar">
+          <div className="wrap">
+          <div className="cats">
+            {cats.map(c => (
+              <button key={c} className={c === cat ? 'chip on' : 'chip'} onClick={() => setCat(c)}>
+                {c}<i>{c === 'Все' ? all.length : all.filter(p => p.cat === c).length}</i>
+              </button>
+            ))}
+          </div>
           </div>
         </div>
 
@@ -338,11 +378,7 @@ export default function App() {
             ))}
           </div>
 
-          {list.length > limit && (
-            <button className="more" onClick={() => setLimit(l => l + 48)}>
-              Показать ещё <b>{Math.min(48, list.length - limit)}</b> из {list.length - limit}
-            </button>
-          )}
+{list.length > limit && <div className="more-auto" ref={moreRef}>Показано {limit} из {list.length}…</div>}
           {!list.length && (
             <div className="empty">
               Ничего не нашлось.{' '}
@@ -371,6 +407,8 @@ export default function App() {
           </div>
         </section>
       )}
+
+      <RoutineBuilder all={all} onOpen={setOpen} />
 
       <section className="how" data-reveal>
         <div className="wrap">
@@ -410,7 +448,9 @@ export default function App() {
           </div>
           <div className="foot-links">
             <a href={waLink('Здравствуйте!')} target="_blank" rel="noreferrer">WhatsApp {meta.contact}</a>
-            <a href={waLink('Здравствуйте! Интересует опт.')} target="_blank" rel="noreferrer">Опт и салонам</a>
+            {OPT
+              ? <a href="https://lilo.asia/">Розничный каталог</a>
+              : <a href={waLink('Здравствуйте! Интересует опт.')} target="_blank" rel="noreferrer">Опт и салонам</a>}
           </div>
         </div>
       </footer>

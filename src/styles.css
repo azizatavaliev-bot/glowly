@@ -1071,3 +1071,93 @@ button.m-buy { border: 0; width: 100%; font-family: inherit; }
 }
 
 @media (max-width: 720px) { .top .bag-btn { display: none; } }
+
+/* ───── упрощение витрины (08.10.2026): меньше строк в карточке, больше товаров на экране ───── */
+.card .row { padding-top: 6px; margin-top: auto; }
+.card .price { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.card .price s { display: inline; margin: 0; font-size: 12px; }
+.card .buy, .card .stepper.wide { margin-top: 10px; }
+.mbar span svg { display: block; }
+@media (hover: none) { .card .peek { display: none; } }
+@media (max-width: 720px) {
+  .hints { display: none; }                 /* быстрые подсказки дублируют поиск и полки «Что вам нужно?» */
+  .card .body { padding: 11px 12px 12px; gap: 3px; }
+  .card h3 { font-size: 13px; }
+  .card .price { font-size: 16.5px; }
+  .mbar span { height: 22px; }
+  .mbar i { top: -4px; right: -9px; }
+}
+@media (max-width: 720px) {
+  .mbar { background: #fff; }
+  /* преимущества — четыре короткие плашки вместо экрана текста */
+  .perks { padding: 22px 0 0; }
+  .perks-in { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .perks-in > div { padding: 12px 14px; border-radius: 12px; }
+  .perks-in b { font-size: 13px; margin: 0; }
+  .perks-in span { display: none; }
+}
+
+/* ───── карточка и каталог «как в маркетплейсе» (08.10.2026) ───── */
+.card { background: none; border: 0; border-radius: 0; overflow: visible; }
+.card:hover { border: 0; }
+.card .pic { border-radius: 16px; background: #efeae4; }
+.card:hover .pic img { transform: scale(1.03); }
+.card .pic img { transition: transform .4s var(--ease); }
+.card .body { padding: 10px 2px 0; gap: 4px; }
+.card .price { font-size: 18px; order: 0; display: flex; align-items: baseline; gap: 7px; flex-wrap: wrap; }
+.card .price s { display: inline; margin: 0; font-size: 12px; font-weight: 500; color: var(--mut); }
+.card .off { font-style: normal; font-size: 11px; font-weight: 700; color: var(--acc); background: var(--acc-soft); padding: 2px 6px; border-radius: 6px; margin: 0; }
+.card h3 { font-size: 13.5px; font-weight: 500; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card h3 b { font-weight: 700; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--mut); margin-right: 2px; }
+.card .sub { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card .buy, .card .stepper.wide { margin-top: auto; }
+.card .buy { background: var(--ink); color: #fff; border-radius: 11px; padding: 11px; font-size: 13px; transform: translateY(8px); margin-bottom: 8px; }
+.card .buy:hover { background: var(--acc); }
+.card .stepper.wide { transform: translateY(8px); margin-bottom: 8px; border-radius: 11px; }
+.card .heart { box-shadow: none; }
+.grid { gap: 26px 16px; }
+.cats-bar { position: sticky; top: 70px; z-index: 30; background: var(--bg); padding: 10px 0; margin: -6px 0 14px; border-bottom: 1px solid var(--line); }
+.cats-bar .cats { margin-top: 0; }
+.sticky { border-bottom: 0; margin-bottom: 0; }
+.more-auto { text-align: center; color: var(--mut); font-size: 13px; padding: 30px 0; }
+@media (max-width: 720px) {
+  .grid { gap: 22px 10px; }
+  .card .body { padding: 8px 2px 0; }
+  .card .price { font-size: 16.5px; }
+  .card h3 { font-size: 12.5px; }
+  .card .sub { font-size: 11.5px; }
+  .card .pic { border-radius: 14px; }
+  .cats-bar { top: 62px; padding: 8px 0; }
+}
+
+/* ───── оптовая витрина /opt ───── */
+.opt-tag { font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #fff; background: var(--acc); padding: 4px 8px; border-radius: 6px; margin-left: -6px; flex: none; }
+.off-btn { text-align: center; background: #e9e3dc !important; color: var(--mut) !important; cursor: default; }
+
+/* ───── логотип: варианты serif и spaced (14.10.2026) ───── */
+.lg-serif, .lg-spaced { width: auto; gap: 2px; align-items: flex-start; }
+.lg-serif b { font: italic 500 30px/1 "Playfair Display", Georgia, serif; letter-spacing: -.01em; }
+.lg-serif b i { font: inherit; font-style: normal; letter-spacing: 0; text-transform: none; margin: 0; text-align: left; color: var(--acc); }
+.lg-serif small, .lg-spaced small { font-size: 7.5px; font-weight: 600; letter-spacing: .42em; text-transform: uppercase; color: var(--mut); padding-left: 2px; }
+.lg-spaced b { font: 500 19px/1 Manrope, sans-serif; letter-spacing: .42em; display: inline-flex; align-items: center; }
+.lg-spaced b i { width: 7px; height: 7px; border-radius: 50%; background: var(--acc); margin-left: -2px; }
+.foot-logo .lg-serif b { font-size: 40px; } .foot-logo .lg-spaced b { font-size: 24px; }
+.foot-logo .lg-serif small, .foot-logo .lg-spaced small { color: rgba(255,255,255,.55); font-size: 9px; }
+@media (max-width: 720px) { .top.solid .lg-serif b { font-size: 25px; } .top.solid .lg-spaced b { font-size: 16px; } .top.solid .lg-serif small, .top.solid .lg-spaced small { font-size: 6.5px; } }
+
+/* «lılo» с каплей вместо точки над i: капля стоит над безточечной ı и масштабируется вместе с буквами */
+.lg-drop2 .dl { position: relative; display: inline-block; }
+.lg-drop2 .dl svg { position: absolute; left: 50%; top: -.06em; width: .22em; height: .3em; transform: translateX(-38%); fill: var(--acc); overflow: visible; }
+.tier { font-size: 13px; font-weight: 600; color: #1a8f52; } .tier span { display: block; font-weight: 400; color: var(--mut); margin-top: 2px; }
+
+/* ───── условия опта на /opt ───── */
+.opt-terms { padding: 48px 0 8px; }
+.ot-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; grid-template-rows: auto auto; gap: 14px; }
+.ot-grid > div { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 20px; }
+.ot-grid > div > b { display: block; font-size: 15px; margin-bottom: 6px; }
+.ot-grid > div > span { color: var(--mut); font-size: 13.5px; line-height: 1.5; }
+.ot-tiers { grid-row: span 2; }
+.ot-tier { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.ot-tier span { font-size: 18px; font-weight: 700; } .ot-tier i { font-style: normal; font-size: 13px; color: var(--acc); font-weight: 600; }
+.ot-tiers p { font-size: 13px; color: var(--mut); margin: 12px 0 0; }
+@media (max-width: 720px) { .ot-grid { grid-template-columns: 1fr; } .ot-tiers { grid-row: auto; } .opt-terms { padding-top: 28px; } }
