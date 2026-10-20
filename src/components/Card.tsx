@@ -1,6 +1,7 @@
 import type { Product } from '../types'
 import { cover } from '../photo'
-import { price, cityPrice, saving, som } from '../pricing'
+import { price, retail, som } from '../pricing'
+import { OPT } from '../mode'
 import { split, expiry } from '../name'
 import BuyButton from './BuyButton'
 import { useFavorites } from '../store'
@@ -13,9 +14,6 @@ type Props = {
 
 export default function Card({ p, onOpen }: Props) {
   const pic = cover(p)
-  const save = saving(p)
-  // скидка считается от «цены города» — той же, что зачёркнута рядом
-  const off = Math.round(save / cityPrice(p) * 100)
   const { title, sub } = split(p)
   const fav = useFavorites()
   const liked = fav.has(p.id)
@@ -32,11 +30,10 @@ export default function Card({ p, onOpen }: Props) {
         </button>
       </div>
       <div className="body">
-        <div className="price">
-          {som(price(p))}
-          {save > 0 && <s>{som(cityPrice(p))}</s>}
-          {off >= 5 && <em className="off">−{off}%</em>}
-        </div>
+        {/* на опте — обе цены с подписями, без зачёркиваний и процентов */}
+        {OPT
+          ? <div className="price two"><span><i>опт</i>{som(price(p))}</span><span className="rt"><i>розница</i>{som(retail(p))}</span></div>
+          : <div className="price">{som(price(p))}</div>}
         <h3 onClick={onOpen}><b>{p.brand}</b> {title}</h3>
         <div className="sub" onClick={onOpen}>{[sub, p.spec].filter(Boolean).join(' · ')}</div>
         {expiry(p) && <div className="exp">годен {expiry(p)}</div>}

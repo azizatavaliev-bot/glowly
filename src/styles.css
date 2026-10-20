@@ -1161,3 +1161,11 @@ button.m-buy { border: 0; width: 100%; font-family: inherit; }
 .ot-tier span { font-size: 18px; font-weight: 700; } .ot-tier i { font-style: normal; font-size: 13px; color: var(--acc); font-weight: 600; }
 .ot-tiers p { font-size: 13px; color: var(--mut); margin: 12px 0 0; }
 @media (max-width: 720px) { .ot-grid { grid-template-columns: 1fr; } .ot-tiers { grid-row: auto; } .opt-terms { padding-top: 28px; } }
+
+/* опт: две цены с подписями вместо зачёркнутой и процента */
+.price.two { display: flex; gap: 18px; align-items: flex-end; flex-wrap: wrap; }
+.price.two span { display: flex; flex-direction: column; line-height: 1.1; }
+.price.two i { font-style: normal; font-size: 10.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--mut); margin-bottom: 3px; }
+.price.two .rt { color: var(--mut); font-weight: 600; }
+.card .price.two .rt { font-size: 14px; }
+.price.big.two .rt { font-size: 22px; }

@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import type { Product, Video } from '../types'
 import { summary, volume, benefits, forWhom, steps } from '../describe'
 import { photos } from '../photo'
-import { price, cityPrice, saving, som, inStock, ORDER_DAYS } from '../pricing'
+import { price, retail, som, inStock, ORDER_DAYS } from '../pricing'
+import { OPT } from '../mode'
 import { split, full } from '../name'
 import videos from '../data/videos.json'
 import details from '../data/details.json'
@@ -50,7 +51,6 @@ export default function ProductModal({ p, onClose, onBrand, similar, onOpen, pre
   const who = d?.for ?? forWhom(p)
   const how = d?.howto ?? steps(p)
   const clip = (videos as Record<string, Video[]>)[String(p.id)]?.[0]
-  const save = saving(p)
   const fav = useFavorites()
   const cart = useCart()
   const inCart = cart.qty(p.id)
@@ -149,13 +149,9 @@ export default function ProductModal({ p, onClose, onBrand, similar, onOpen, pre
           {p.spec && <div className="spec big">{p.spec}</div>}
 
           <div className="m-price">
-            <div className="price big">{som(price(p))}</div>
-            {save > 0 && (
-              <div className="save">
-                <s>{som(cityPrice(p))}</s>
-                <span>выгода {som(save)}</span>
-              </div>
-            )}
+            {OPT
+              ? <div className="price big two"><span><i>опт</i>{som(price(p))}</span><span className="rt"><i>розница</i>{som(retail(p))}</span></div>
+              : <div className="price big">{som(price(p))}</div>}
           </div>
 
           <div className="m-cta">
