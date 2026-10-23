@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Product } from '../types'
 import { cover } from '../photo'
-import { price, som, optPrice, optTier, OPT_TIERS } from '../pricing'
+import { price, som, optPrice, optTier, OPT_TIERS, usd, optUsd, usdSum } from '../pricing'
 import { split, full } from '../name'
 import { useCart } from '../store'
 import { waLink } from '../brand'
@@ -32,6 +32,9 @@ export default function CartPanel({ all, onOpen, onClose }: Props) {
   const tier = OPT ? optTier(base) : null
   const unit = (p: Product) => tier ? optPrice(p, tier.k) : price(p)
   const total = rows.reduce((s, r) => s + unit(r.p) * r.qty, 0)
+  // на опте рядом с сомами — доллары по той же ступени
+  const d = (p: Product, qty = 1) => tier ? ` · ${usd(Math.round(optUsd(p, tier.k) * qty * 100) / 100)}` : ''
+  const dTotal = tier ? ` · ${usd(usdSum(rows, tier.k))}` : ''
   const next = tier ? OPT_TIERS.find(t => t.from > base) : undefined
   const lack = OPT ? Math.max(0, OPT_MIN - total) : 0
 
@@ -39,9 +42,9 @@ export default function CartPanel({ all, onOpen, onClose }: Props) {
     `Здравствуйте! ${OPT ? 'Оптовый заказ' : 'Заказ'} № ${cart.order} с сайта lilo.asia`,
     '',
     ...rows.map((r, i) =>
-      `${i + 1}. ${full(r.p)}${r.p.spec ? ` (${r.p.spec})` : ''} — ${r.p.brand}\n   ${r.qty} шт × ${som(unit(r.p))} = ${som(unit(r.p) * r.qty)}`),
+      `${i + 1}. ${full(r.p)}${r.p.spec ? ` (${r.p.spec})` : ''} — ${r.p.brand}\n   ${r.qty} шт × ${som(unit(r.p))}${d(r.p)} = ${som(unit(r.p) * r.qty)}${d(r.p, r.qty)}`),
     '',
-    `Итого: ${som(total)} · ${cart.count} шт${tier ? ` (оптовая цена ${tier.label})` : ""}`,
+    `Итого: ${som(total)}${dTotal} · ${cart.count} шт${tier ? ` (оптовая цена ${tier.label})` : ""}`,
     '',
     'Подтвердите, пожалуйста, наличие и когда сможете привезти.',
   ].join('\n')
@@ -66,14 +69,14 @@ export default function CartPanel({ all, onOpen, onClose }: Props) {
               {cover(p) ? <img src={cover(p)!} alt="" onClick={() => onOpen(p)} /> : <div className="noimg sm" />}
               <div className="ci-b">
                 <div className="ci-n" onClick={() => onOpen(p)}>{split(p).title}{p.spec ? ` · ${p.spec}` : ''}</div>
-                <div className="ci-p">{p.brand} · {som(unit(p))}</div>
+                <div className="ci-p">{p.brand} · {som(unit(p))}{d(p)}</div>
                 <div className="ci-q">
                   <div className="stepper">
                     <button onClick={() => cart.set(p.id, qty - 1)} aria-label="Меньше">−</button>
                     <b>{qty}</b>
                     <button onClick={() => cart.set(p.id, qty + 1)} aria-label="Больше">+</button>
                   </div>
-                  <b className="ci-sum">{som(unit(p) * qty)}</b>
+                  <b className="ci-sum">{som(unit(p) * qty)}{d(p, qty)}</b>
                 </div>
               </div>
               <button className="ci-x" onClick={() => cart.set(p.id, 0)} aria-label="Убрать">×</button>
@@ -90,7 +93,7 @@ export default function CartPanel({ all, onOpen, onClose }: Props) {
                 {next && <span>Ещё {som(next.from - base)} — и цена {next.label} будет ниже</span>}
               </div>
             )}
-            <div className="total">Итого: <b>{som(total)}</b> · {cart.count} шт</div>
+            <div className="total">Итого: <b>{som(total)}{dTotal}</b> · {cart.count} шт</div>
             {lack > 0
               ? <div className="add big off-btn">До минимального заказа ещё {som(lack)}</div>
               : <a className="add big wa-btn" href={waLink(text)} target="_blank" rel="noreferrer" onClick={() => setSent(true)}>

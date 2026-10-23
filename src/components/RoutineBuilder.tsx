@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
 import type { Product } from '../types'
 import { cover } from '../photo'
-import { price, som, inStock } from '../pricing'
+import { price, som, inStock, money, usd, usdSum } from '../pricing'
+import { OPT } from '../mode'
 import { split } from '../name'
 import { useCart, openCart } from '../store'
 import { NEEDS } from '../needs'
@@ -111,7 +112,7 @@ export default function RoutineBuilder({ all, onOpen }: Props) {
                       <div className="rb-name" onClick={() => onOpen(r.p!)}>{split(r.p).title}</div>
                       <div className="rb-sub">{split(r.p).sub}</div>
                       <div className="rb-row">
-                        <b>{som(price(r.p))}</b>
+                        <b>{money(r.p)}</b>
                         <button className="rb-swap" onClick={() => swap(i)}>↻ заменить</button>
                       </div>
                     </>
@@ -122,7 +123,7 @@ export default function RoutineBuilder({ all, onOpen }: Props) {
             <div className="rb-total">
               <div>
                 <span>Весь уход</span>
-                <b>{som(total)}</b>
+                <b>{som(total)}{OPT && ` · ${usd(usdSum(routine.flatMap(r => r.p ? [{ p: r.p, qty: 1 }] : [])))}`}</b>
                 <i>{routine.filter(r => r.p).length} средств · хватит на 2–3 месяца</i>
               </div>
               <button className="add big" onClick={toCart}>Добавить весь набор в корзину</button>

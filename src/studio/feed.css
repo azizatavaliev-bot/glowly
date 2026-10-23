@@ -87,3 +87,5 @@
 .ig-hl { gap: 10px; } .ig-hl button span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 64px; }
 .ig-name { font-weight: 700; } .ig-cat { color: #737373; display: block; }
 .fd-tip { font-size: 12px; color: var(--mut); margin: 8px 0 0; }
+.fd-photo { position: relative; overflow: hidden; } .fd-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fd-photo span { position: absolute; left: 7%; bottom: 5%; color: #fff; filter: drop-shadow(0 1px 4px rgba(0,0,0,.3)); } .fd-photo .lg-serif b { color: #fff; font-size: 1.6em; }

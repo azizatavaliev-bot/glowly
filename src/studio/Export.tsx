@@ -12,7 +12,8 @@ export default function Export() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 40, padding: 20, background: '#888' }}>
       {PLAN.map((it, i) => it.kind === 'post'
         ? <div key={i} data-n={i} className="tone-dark" style={{ width: 1080, height: 1350 }}><Post {...it.input} /></div>
-        : <div key={i} data-n={i} style={{ width: 1080, height: 1920 }}><ReelCover id={it.id} top={it.top} big={it.big} w={1080} /></div>)}
+        : it.kind === 'reel' ? <div key={i} data-n={i} style={{ width: 1080, height: 1920 }}><ReelCover id={it.id} top={it.top} big={it.big} w={1080} /></div>
+        : null)}
       {/* актуальное: обложка кружка и сторис внутри */}
       {HIGHLIGHTS.map((h, k) => (
         <div key={h.key} style={{ display: 'contents' }}>

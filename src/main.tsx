@@ -6,6 +6,10 @@ import Format from './studio/Format'
 import Feed from './studio/Feed'
 import Export from './studio/Export'
 import './styles.css'
+import { OPT } from './mode'
+
+// опт: только современный шрифт, без курсива с засечками (23.10.2026)
+if (OPT) document.documentElement.classList.add('opt')
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

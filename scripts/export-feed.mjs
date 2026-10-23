@@ -3,7 +3,7 @@ import { chromium } from 'playwright'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-const OUT = path.join(os.homedir(), 'Desktop/LILO Инста/Лента 72 публикации')
+const OUT = path.join(os.homedir(), 'Desktop/Работа/Мои проекты/KorShop/LILO Инста/Лента — все публикации')
 fs.rmSync(OUT, { recursive: true, force: true }); fs.mkdirSync(OUT, { recursive: true })
 const b = await chromium.launch()
 const p = await b.newPage({ viewport: { width: 1200, height: 1000 } })
@@ -18,7 +18,7 @@ const e = await b.newPage({ viewport: { width: 1200, height: 2000 } })
 await e.goto('http://localhost:5280/export', { waitUntil: 'networkidle' }); await e.waitForTimeout(2500)
 const plan = []
 for (const [i, m] of meta.entries()) {
-  const n = String(i + 1).padStart(2, '0')
+  const n = String(i + 1).padStart(3, '0')
   const base = `${n} ${m.kind === 'reel' ? 'Reels' : 'пост'} — ${m.name.replace(/[/\\:]/g, ' ')}`
   const el = e.locator(`[data-n="${i}"]`); await el.scrollIntoViewIfNeeded(); await e.waitForTimeout(150)
   await el.screenshot({ path: path.join(OUT, base + '.png') })
@@ -26,8 +26,8 @@ for (const [i, m] of meta.entries()) {
   plan.push(`${n}. ${m.date} — ${m.kind === 'reel' ? 'Reels (обложка)' : 'Пост'} — ${m.name}`)
 }
 fs.writeFileSync(path.join(OUT, '00 порядок публикации.txt'),
-`ЛЕНТА LILO OPT — 72 публикации, 12 недель
-Публиковать строго по номерам: 01 первой, 72 последней.
+`ЛЕНТА LILO OPT — ${meta.length} публикаций
+Публиковать строго по номерам: 01 первой, ${meta.length} последней.
 
 ШАХМАТКА
 В сетке 3 колонки, поэтому чередование «рилс — пост» само даёт шахматный порядок:

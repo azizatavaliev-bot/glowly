@@ -119,3 +119,9 @@
 
 /* шахматка ленты: посты — песок (совет — какао), рилсы — крем */
 .tone-dark .m:not(.t-совет) { background: radial-gradient(120% 70% at 50% 40%, #f1e8dc 0%, #e7dccd 60%, #ddcfbe 100%); }
+
+/* полировка 20.10: призыв ближе к названию, список крупнее, фото-плитка с настоящим логотипом */
+.m .lux-ph { width: 420px; height: 520px; margin-bottom: 56px; }
+.m .lux-cta { margin: 40px 0 0; }
+.m .pk-list span { font-size: 26px; } .m .pk-list small { font-size: 15px; } .m .pk-list li { padding: 15px 0; }
+.m .aa { font-size: 36px; }

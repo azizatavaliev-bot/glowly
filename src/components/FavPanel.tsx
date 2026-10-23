@@ -1,7 +1,8 @@
 import { useEffect } from 'react'
 import type { Product } from '../types'
 import { cover } from '../photo'
-import { price, som } from '../pricing'
+import { price, som, money, usd, usdSum } from '../pricing'
+import { OPT } from '../mode'
 import { split } from '../name'
 import { useCart, openCart } from '../store'
 
@@ -44,7 +45,7 @@ export default function FavPanel({ items, onOpen, onRemove, onClear, onClose }: 
               {cover(p) ? <img src={cover(p)!} alt="" onClick={() => onOpen(p)} /> : <div className="noimg sm" />}
               <div className="ci-b" onClick={() => onOpen(p)}>
                 <div className="ci-n">{split(p).title}{p.spec ? ` · ${p.spec}` : ''}</div>
-                <div className="ci-p"><b>{som(price(p))}</b> · {p.brand}</div>
+                <div className="ci-p"><b>{money(p)}</b> · {p.brand}</div>
               </div>
               <button className="ci-x" onClick={() => onRemove(p.id)} aria-label="Убрать">×</button>
             </div>
@@ -53,7 +54,7 @@ export default function FavPanel({ items, onOpen, onRemove, onClear, onClose }: 
 
         {!!items.length && (
           <div className="cart-foot">
-            <div className="total">Итого: <b>{som(total)}</b> · {items.length} поз.</div>
+            <div className="total">Итого: <b>{som(total)}{OPT && ` · ${usd(usdSum(items.map(p => ({ p, qty: 1 }))))}`}</b> · {items.length} поз.</div>
             <button className="add big" onClick={toCart}>Перенести всё в корзину</button>
             <div className="mini">
               <button className="danger" onClick={onClear}>Очистить список</button>

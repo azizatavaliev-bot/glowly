@@ -7,6 +7,10 @@ import { OPT_MIN } from '../mode'
 import { Highlight, HIGHLIGHTS, SLIDES } from './highlights'
 import { LOGO_VARIANT } from '../brand'
 import Logo from '../components/Logo'
+import cutReport from '../../scripts/cutout_report.json'
+import rejectJson from '../../scripts/photo_reject.json'
+import contentReject from '../../scripts/content_reject.json'
+import { split } from '../name'
 import { Post, caption, type PostInput, type PostType } from './posts'
 import { ReelCover } from './Format'
 import './studio.css'
@@ -23,19 +27,20 @@ const byId = (id: number) => ALL.find(p => p.id === id)!
 type Item =
   | { kind: 'post'; input: PostInput }
   | { kind: 'reel'; id: number; top: string; big: string; cap: string }
+  | { kind: 'photo'; src: string; cap: string }   // атмосферная картинка без товара
 
 const post = (type: PostType, ids: number[], title = '', faq = 0): Item =>
   ({ kind: 'post', input: { type, items: ids.map(byId), title, faq, logo: LOGO_VARIANT, cut: true, opt: true } })
 const reel = (id: number, top: string, big: string, cap: string): Item => ({ kind: 'reel', id, top, big, cap })
 
 // 12 недель по 6 публикаций (72): Пн рилс-хит · Вт товар · Ср рилс опт · Чт польза · Пт рилс новинка · Сб подборка/уход
-export const PLAN: Item[] = [
+const BASE_PLAN: Item[] = [
   reel(528, 'Бестселлер', 'Reedle Shot 100', 'Сыворотка с микроиглами, о которой спрашивают чаще всего. На складе — в объёме.'),
   post('товар', [528]),
   reel(427, 'Склад LILO', 'Корейский уход оптом', 'Более 500 позиций из Кореи — в наличии в Бишкеке. Без коробов, любым набором.'),
   post('совет', [528]),
   reel(33, 'Новинка', 'Anua PDRN 100', 'Сыворотка с капсулами PDRN — новое поступление Anua.'),
-  post('подборка', [534, 510, 32, 64], 'Хиты LILO'),
+  post('подборка', [32, 534, 510, 64], 'Хиты LILO'),
 
   reel(427, 'Солнцезащита', 'Каждый день', 'Round Lab Birch Juice — лёгкий SPF, который берут постоянно.'),
   post('товар', [427]),
@@ -115,6 +120,67 @@ export const PLAN: Item[] = [
   post('подборка', [528, 534, 510, 33], 'Линия PDRN'),
 ]
 
+/**
+ * Продолжение ленты (недели 13–20): товары, которых ещё не было, по одному на картинку.
+ * Порядок недели тот же — рилс, пост, рилс, подборка, рилс, пост, — поэтому шахматка продолжается.
+ */
+const CAT_TOP: Record<string, string> = { 'Уход за лицом': 'Уход', 'Очищение': 'Очищение', 'Солнцезащита': 'Солнцезащита', 'Макияж': 'Макияж', 'Губы': 'Губы', 'Волосы': 'Волосы', 'Маски и патчи': 'Маски и патчи', 'Тело': 'Тело', 'Наборы': 'Подарки' }
+const CAT_SET: Record<string, string> = { 'Уход за лицом': 'Ежедневный уход', 'Очищение': 'Мягкое очищение', 'Солнцезащита': 'Защита от солнца', 'Макияж': 'Лёгкий макияж', 'Губы': 'Уход за губами', 'Волосы': 'Уход за волосами', 'Маски и патчи': 'Маски и патчи', 'Тело': 'Уход за телом', 'Наборы': 'Наборы в подарок' }
+const short = (p: Product) => split(p).sub.replace(/^Kdh /i, '').replace(/\s*\d+(?:[.,]\d+)?\s?(ml|g|ea)\b.*$/i, '').split(' ').slice(0, 3).join(' ')
+function morePlan(weeks: number): Item[] {
+  const used = new Set<number>()
+  for (const it of BASE_PLAN) { if (it.kind === 'reel') used.add(it.id); else if (it.kind === 'post') it.input.items.forEach(p => used.add(p.id)) }
+  const bad = new Set<number>([...rejectJson.ids, ...contentReject.ids])
+  const rep = cutReport as Record<string, { how: string }>
+  // только товары с чистым фото без фона, без дублей вариантов (один оттенок на название)
+  const seen = new Set<string>()
+  const pool = ALL.filter(p => CAT_TOP[p.cat] && p.photos?.length && !used.has(p.id) && !bad.has(p.id)
+    && rep[p.id] && !rep[p.id].how.includes('не нашлось') && !seen.has(p.brand + p.name) && seen.add(p.brand + p.name))
+  // чередуем категории, чтобы соседние публикации были разными
+  const byCat: Record<string, Product[]> = {}
+  pool.forEach(p => (byCat[p.cat] ??= []).push(p))
+  const cats = Object.keys(byCat).sort((a, b) => byCat[b].length - byCat[a].length)
+  let ci = 0
+  const take = (cat?: string): Product | undefined => {
+    for (let k = 0; k < cats.length; k++) {
+      const c = cat ?? cats[(ci + k) % cats.length]
+      const p = byCat[c]?.shift()
+      if (p) { if (!cat) ci = (ci + k + 1) % cats.length; return p }
+      if (cat) return undefined
+    }
+  }
+  const r = (p: Product) => reel(p.id, p.id >= 758 ? 'Новинка' : CAT_TOP[p.cat], short(p),
+    `${p.brand} ${split(p).title.toLowerCase()} — в наличии в объёме.`)
+  const out: Item[] = []
+  for (let w = 0; w < weeks; w++) {
+    const a = take(), b = take(), c = take(), d = take(), e = take()
+    const setCat = cats.find(c => (byCat[c]?.length ?? 0) >= 4) ?? cats[0]
+    const set = [take(setCat), take(setCat), take(setCat), take(setCat)].filter((x): x is Product => !!x)
+    if (!a || !b || !c || !d || !e || set.length < 3) break
+    out.push(r(a), post('товар', [b.id]), r(c), post('подборка', set.map(x => x.id), CAT_SET[setCat]), r(d), post('товар', [e.id]))
+  }
+  return out
+}
+export const PLAN: Item[] = [...BASE_PLAN, ...morePlan(8)]
+
+/**
+ * Воскресные публикации — атмосфера без товара (Higgsfield, стиль крем/песок/какао).
+ * Идут по одной после каждых шести публикаций недели; нумерация Пн–Сб не меняется.
+ */
+export const SUNDAYS: Item[] = [
+  { kind: 'photo', src: '/atm/hands-water.png', cap: 'Вода, свет и ничего лишнего.' },
+  { kind: 'photo', src: '/atm/cream.png', cap: 'Текстура, которую хочется трогать.' },
+  { kind: 'photo', src: '/atm/linen.png', cap: 'Утро начинается с ухода.' },
+  { kind: 'photo', src: '/atm/drops.png', cap: 'Увлажнение — основа всего.' },
+]
+/** Лента как в профиле: 6 публикаций недели + воскресная атмосфера, пока она есть. */
+export const FEED: { it: Item; i: number }[] = PLAN.flatMap((it, i) => {
+  const out = [{ it, i }]
+  const w = Math.floor(i / 6)
+  if (i % 6 === 5 && SUNDAYS[w]) out.push({ it: SUNDAYS[w], i: -(w + 1) })
+  return out
+})
+
 // описание профиля: 150 символов, первая строка — кто мы, дальше условия
 export const NAME = 'LILO · корейская косметика оптом'
 export const CATEGORY = 'Оптовая компания'
@@ -124,14 +190,19 @@ const START = new Date(2026, 9, 20) // понедельник, 20 октября
 const DAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб']
 export const dateOf = (i: number) => {
   const d = new Date(START)
+  if (i < 0) { d.setDate(START.getDate() + (-i - 1) * 7 + 6); return `Вс, ${d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}` }
   d.setDate(START.getDate() + Math.floor(i / 6) * 7 + (i % 6))
   return `${DAYS[i % 6]}, ${d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}`
 }
 export const capOf = (it: Item) => it.kind === 'post' ? caption(it.input)
+  : it.kind === 'photo' ? `${it.cap}\n\nLILO — корейская косметика оптом в Бишкеке\nКаталог и цены — lilo.asia/opt\n\n#корейскаякосметикаоптом #косметикабишкек`
   : `${it.cap}\n\nАктуальные оптовые цены и весь каталог — на lilo.asia/opt\nОпт от ${som(OPT_MIN)}, без коробов\n\n#корейскаякосметикаоптом #косметикаоптом #оптбишкек`
 
 /** Плитка сетки 4:5. Рилс 9:16 обрезается до середины, как в профиле Instagram. */
 export function Tile({ it, w }: { it: Item; w: number }) {
+  if (it.kind === 'photo') return (
+    <div className="fd-photo" style={{ width: w, height: w * 1.25 }}><img src={it.src} alt="" /><span style={{ width: w * 0.16 }}><Logo caption={false} /></span></div>
+  )
   // шахматка: в сетке из 3 колонок чередование по номеру = шахматный порядок; посты тёмные, рилсы светлые
   if (it.kind === 'post') return (
     <div className="tone-dark" style={{ width: w, height: w * 1.25, overflow: 'hidden' }}>
@@ -150,7 +221,7 @@ export default function Feed() {
   const [view, setView] = useState<'grid' | 'feed'>('grid')
   const [open, setOpen] = useState<number | null>(null)
   // в профиле новое сверху: последняя публикация плана — первая плитка
-  const shown = useMemo(() => PLAN.map((it, i) => ({ it, i })).reverse(), [])
+  const shown = useMemo(() => [...FEED].reverse(), [])
   const reels = PLAN.filter(p => p.kind === 'reel').length
   const [busy, setBusy] = useState(false)
   const [hl, setHl] = useState<string | null>(null)
@@ -189,7 +260,7 @@ export default function Feed() {
         <p>{PLAN.length} публикаций на 9 недель: {reels} рилсов и {PLAN.length - reels} постов, с 20 октября по 20 декабря.</p>
         <p>Новое в профиле — сверху, поэтому первая публикация плана внизу сетки. Нажмите на плитку — откроется пост с подписью и датой.</p>
         <div className="fd-legend"><b>Неделя</b>
-          {['Пн — рилс: хит крупно', 'Вт — пост: товар', 'Ср — рилс: склад и опт', 'Чт — пост: совет или вопрос', 'Пт — рилс: новинка', 'Сб — пост: подборка или уход', 'Вс — только сторис'].map(s => <span key={s}>{s}</span>)}
+          {['Пн — рилс: хит крупно', 'Вт — пост: товар', 'Ср — рилс: склад и опт', 'Чт — пост: совет или вопрос', 'Пт — рилс: новинка', 'Сб — пост: подборка или уход', 'Вс — атмосфера: фото без товара'].map(s => <span key={s}>{s}</span>)}
         </div>
         <div className="fd-legend"><b>Обложки актуального</b>
           <div className="fd-hl">{HIGHLIGHTS.map(h => <div key={h.key}><Highlight h={h} size={44} /><span>{h.label}</span></div>)}</div>
@@ -213,12 +284,12 @@ export default function Feed() {
         <div className="ig-tabs"><button className={view === 'grid' ? 'on' : ''} onClick={() => setView('grid')}>▦ Сетка</button><button className={view === 'feed' ? 'on' : ''} onClick={() => setView('feed')}>☰ Лента</button></div>
 
         {view === 'grid' ? (
-          <div className="ig-grid">{shown.map(({ it, i }) => (
-            <button key={i} onClick={() => setOpen(i)} title={dateOf(i)}><Tile it={it} w={129} /></button>))}
+          <div className="ig-grid">{shown.map(({ it, i }, k) => (
+            <button key={k} onClick={() => setOpen(k)} title={dateOf(i)}><Tile it={it} w={129} /></button>))}
           </div>
         ) : (
-          <div className="ig-feed">{shown.map(({ it, i }) => (
-            <article key={i}>
+          <div className="ig-feed">{shown.map(({ it, i }, k) => (
+            <article key={k}>
               <div className="ig-post-h"><i><Logo caption={false} /></i><b>lilo.opt</b><span>{dateOf(i)}</span></div>
               <Tile it={it} w={390} />
               <div className="ig-cap"><b>lilo.opt</b> {capOf(it)}</div>
@@ -253,15 +324,15 @@ export default function Feed() {
       {open !== null && (
         <div className="fd-modal" onClick={() => setOpen(null)}>
           <div className="fd-card" onClick={e => e.stopPropagation()}>
-            <Tile it={PLAN[open]} w={430} />
+            <Tile it={shown[open].it} w={430} />
             <div className="fd-meta">
-              <span className="fd-date">№ {open + 1} · {dateOf(open)} · {PLAN[open].kind === 'reel' ? 'Reels' : 'пост'}</span>
-              <pre>{capOf(PLAN[open])}</pre>
+              <span className="fd-date">{shown[open].i >= 0 ? `№ ${shown[open].i + 1} · ` : ''}{dateOf(shown[open].i)} · {shown[open].it.kind === 'reel' ? 'Reels' : shown[open].it.kind === 'photo' ? 'атмосфера' : 'пост'}</span>
+              <pre>{capOf(shown[open].it)}</pre>
               <div className="fd-nav">
-                <button disabled={open === 0} onClick={() => setOpen(open - 1)}>← раньше</button>
-                <button disabled={open === PLAN.length - 1} onClick={() => setOpen(open + 1)}>позже →</button>
+                <button disabled={open === shown.length - 1} onClick={() => setOpen(open + 1)}>← раньше</button>
+                <button disabled={open === 0} onClick={() => setOpen(open - 1)}>позже →</button>
               </div>
-              {PLAN[open].kind === 'reel' && <p className="fd-note">Обложка рилса. Сам ролик снимается по регламенту съёмки.</p>}
+              {shown[open].it.kind === 'reel' && <p className="fd-note">Обложка рилса. Сам ролик снимается по регламенту съёмки.</p>}
             </div>
           </div>
         </div>

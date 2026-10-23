@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Product } from '../types'
 import { cover } from '../photo'
-import { price, som } from '../pricing'
+import { som, money } from '../pricing'
 import { split } from '../name'
 import { matches, score } from '../search'
 import { OPT, OPT_MIN } from '../mode'
@@ -119,7 +119,7 @@ export default function Hero({ all, total, brands, columns, hits: topHits, onSta
                   <button key={p.id} onMouseDown={() => onOpen(p)}>
                     {cover(p) && <img src={cover(p)!} alt="" />}
                     <span><b>{split(p).title}</b><i>{p.brand} · {split(p).sub}</i></span>
-                    <u>{som(price(p))}</u>
+                    <u>{money(p)}</u>
                   </button>
                 ))}
                 <button className="all" onMouseDown={submit}>Все результаты по «{q}» →</button>
@@ -150,7 +150,7 @@ export default function Hero({ all, total, brands, columns, hits: topHits, onSta
                 <img src={cover(p) ?? ''} alt="" loading="lazy" />
                 <b>{p.brand}</b>
                 <i>{split(p).title}</i>
-                <u>{som(price(p))}</u>
+                <u>{money(p)}</u>
               </button>
             ))}
           </div>
@@ -165,7 +165,7 @@ export default function Hero({ all, total, brands, columns, hits: topHits, onSta
                     <img src={cover(p) ?? ''} alt="" loading={j < 3 ? 'eager' : 'lazy'} />
                     <figcaption>
                       <b>{p.brand}</b>
-                      <u>{som(price(p))}</u>
+                      <u>{money(p)}</u>
                     </figcaption>
                   </figure>
                 ))}

@@ -9,7 +9,7 @@ import BrandPicker from './components/BrandPicker'
 import Dropdown from './components/Dropdown'
 import { useReveal } from './useReveal'
 import { cover } from './photo'
-import { price, som, TOP, inStock } from './pricing'
+import { price, som, TOP, inStock, money } from './pricing'
 import { split } from './name'
 import { matches, score, HINTS } from './search'
 import { NEEDS, hasNeed, countNeed } from './needs'
@@ -227,31 +227,26 @@ export default function App() {
         </div>
       </header>
 
-      <Hero all={all} total={all.length} brands={brands.length - 1}
-        columns={columns} hits={topList.map(t => t.p)} onStart={toCatalog} onOpen={setOpen}
-        onSearch={qq => { setQ(qq); setNeed(''); setCat('Все'); setBrand('Все'); toCatalog() }}
-        wa={waLink('Здравствуйте! Пишу с сайта LILO Cosmetics — помогите подобрать уход 🙂')} />
-
-      <Marquee items={brands.slice(1)} onPick={pickBrand} />
-
+      {/* опт (23.10.2026, Азиз): сразу каталог — короткая шапка с двумя условиями, без героя, брендов и «Что вам нужно?» */}
       {OPT && (
-        <section className="opt-terms" data-reveal>
+        <section className="opt-top">
           <div className="wrap">
-            <h2 className="sec-title">Условия <em>опта</em></h2>
-            <div className="ot-grid">
-              <div className="ot-tiers">
-                <b>Оптовая цена</b>
-                <div className="ot-tier"><span>от 15 000 с</span><i>одна цена на весь заказ</i></div>
-                <p>Все оптовые цены — в каталоге ниже. Минимальный заказ — 15 000 с в сумме.</p>
-              </div>
-              <div><b>Без коробов</b><span>Берите любой набор позиций от {som(OPT_MIN)} — не нужно закупать по 48 штук одного товара.</span></div>
-              <div><b>Из наличия в Бишкеке</b><span>{all.length} позиций и {brands.length - 1} брендов на складе — то, что видите на сайте, можно забрать сейчас.</span></div>
-              <div><b>Оригиналы из Кореи</b><span>Корейская маркировка, штрихкоды, свежие сроки годности.</span></div>
-              <div><b>Заказ за 2 минуты</b><span>Соберите корзину на сайте → «Отправить заказ» → менеджер подтвердит в WhatsApp.</span></div>
+            <h1>Корейская косметика оптом</h1>
+            <div className="opt-chips">
+              <span><b>Опт от {som(OPT_MIN)}</b> — одна цена на весь заказ</span>
+              <span><b>Без коробов</b> — любой набор позиций</span>
             </div>
           </div>
         </section>
       )}
+
+      {!OPT && <Hero all={all} total={all.length} brands={brands.length - 1}
+        columns={columns} hits={topList.map(t => t.p)} onStart={toCatalog} onOpen={setOpen}
+        onSearch={qq => { setQ(qq); setNeed(''); setCat('Все'); setBrand('Все'); toCatalog() }}
+        wa={waLink('Здравствуйте! Пишу с сайта LILO Cosmetics — помогите подобрать уход 🙂')} />}
+
+      {!OPT && <Marquee items={brands.slice(1)} onPick={pickBrand} />}
+
 
       {!OPT && <section className="perks" data-reveal>
         <div className="wrap perks-in">
@@ -279,14 +274,14 @@ export default function App() {
                 <span className="badge">−{p.sale!.match(/(\d+)%/)?.[1]}%</span>
                 <b>{p.brand}</b>
                 <i>{split(p).title}</i>
-                <u>{som(price(p))}</u>
+                <u>{money(p)}</u>
               </button>
             ))}
           </div>
         </section>
       )}
 
-      <section className="needs" data-reveal>
+      {!OPT && <section className="needs" data-reveal>
         <div className="wrap">
           <h2 className="sec-title">Что вам <em>нужно?</em></h2>
           <div className="need-grid">
@@ -301,10 +296,10 @@ export default function App() {
             ))}
           </div>
         </div>
-      </section>
+      </section>}
 
       <div className="catalog" ref={catalogRef} id="catalog">
-        <div className="wrap">
+        <div className="wrap" hidden={OPT && !need}>
           <h2 className="sec-title" data-reveal>
             {need ? NEEDS.find(n => n.key === need)?.label : 'Каталог'}
           </h2>
@@ -401,7 +396,7 @@ export default function App() {
                 <img src={cover(p) ?? ''} alt="" loading="lazy" />
                 <b>{p.brand}</b>
                 <i>{split(p).title}</i>
-                <u>{som(price(p))}</u>
+                <u>{money(p)}</u>
               </button>
             ))}
           </div>

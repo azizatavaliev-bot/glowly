@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { Product, Video } from '../types'
 import { summary, volume, benefits, forWhom, steps } from '../describe'
 import { photos } from '../photo'
-import { price, retail, som, inStock, ORDER_DAYS } from '../pricing'
+import { price, retail, som, inStock, ORDER_DAYS, usd, optUsd, money } from '../pricing'
 import { OPT } from '../mode'
 import { split, full } from '../name'
 import videos from '../data/videos.json'
@@ -36,7 +36,7 @@ type Detail = {
 
 export function orderLink(p: Product): string {
   const tail = inStock(p) ? 'Подскажите, пожалуйста, подробнее.' : 'Вижу, что под заказ — сколько ждать?'
-  const text = `Здравствуйте! Пишу с сайта LILO Cosmetics, интересует товар:\n${full(p)}${p.spec ? ` (${p.spec})` : ''}\n${p.brand} · ${som(price(p))}\n\n${tail}`
+  const text = `Здравствуйте! Пишу с сайта LILO Cosmetics, интересует товар:\n${full(p)}${p.spec ? ` (${p.spec})` : ''}\n${p.brand} · ${money(p)}\n\n${tail}`
   return waLink(text)
 }
 
@@ -78,7 +78,7 @@ export default function ProductModal({ p, onClose, onBrand, similar, onOpen, pre
 
   const share = async () => {
     const url = `${location.origin}${location.pathname}?p=${p.id}`
-    const data = { title: `${split(p).title} — LILO Cosmetics`, text: `${full(p)} · ${som(price(p))}`, url }
+    const data = { title: `${split(p).title} — LILO Cosmetics`, text: `${full(p)} · ${money(p)}`, url }
     if (navigator.share) { try { await navigator.share(data) } catch { /* отменили */ } }
     else { await navigator.clipboard.writeText(url); toast('Ссылка скопирована') }
   }
@@ -150,7 +150,7 @@ export default function ProductModal({ p, onClose, onBrand, similar, onOpen, pre
 
           <div className="m-price">
             {OPT
-              ? <div className="price big two"><span><i>опт</i>{som(price(p))}</span><span className="rt"><i>розница</i>{som(retail(p))}</span></div>
+              ? <div className="price big two"><span><i>опт</i>{som(price(p))}<b className="usd">{usd(optUsd(p))}</b></span><span className="rt"><i>розница</i>{som(retail(p))}</span></div>
               : <div className="price big">{som(price(p))}</div>}
           </div>
 
@@ -259,7 +259,7 @@ export default function ProductModal({ p, onClose, onBrand, similar, onOpen, pre
                   <button key={s.id} onClick={() => onOpen(s)}>
                     {photos(s)[0] && <img src={photos(s)[0]} alt="" />}
                     <i>{split(s).title}</i>
-                    <u>{som(price(s))}</u>
+                    <u>{money(s)}</u>
                   </button>
                 ))}
               </div>
@@ -271,7 +271,7 @@ export default function ProductModal({ p, onClose, onBrand, similar, onOpen, pre
         {inCart
           ? <button className="m-buy in" onClick={openCart}><span>{inCart} шт</span>В корзине · оформить заказ</button>
           : <button className="m-buy" onClick={() => { cart.add(p.id); toast('🛒 Добавлено в корзину') }}>
-              <span>{som(price(p))}</span>В корзину
+              <span>{money(p)}</span>В корзину
             </button>}
         <a className="m-ask" href={orderLink(p)} target="_blank" rel="noreferrer">Спросить про товар в WhatsApp</a>
       </div>

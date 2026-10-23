@@ -87,8 +87,8 @@ function PostBody({ type, items, title: head, faq, logo, opt }: PostInput) {
         <div className="br">{p.brand}</div>
         <div className="lux-name">{latin(p) || title(p)}</div>
         <div className="lux-type">{title(p)}</div>
+        <div className="lux-cta">Цены и каталог — <em>на сайте</em></div>
       </div>
-      <div className="lux-cta">Цены и каталог — <em>на сайте</em></div>
       <Foot />
     </div>
   )

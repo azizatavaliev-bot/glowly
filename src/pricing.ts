@@ -56,3 +56,15 @@ export function saving(p: Product): number {
 }
 
 export const som = (n: number) => `${n.toLocaleString('ru-RU')} с`
+
+/**
+ * Доллары рядом с оптовой ценой (23.10.2026, Азиз: «где цены оптовые — рядом в долларах»).
+ * Считаются от прайса склада напрямую (прайс × 0.94 × 1.15), а не обратно из округлённых сомов.
+ */
+export const usd = (n: number) => `$${n.toFixed(2).replace('.', ',')}`
+export const optUsd = (p: Product, k = OPT_K): number => Math.round(p.price * k * 100) / 100
+/** Цена строкой: в рознице только сомы, на опте — «1 160 с · $13,30». */
+export const money = (p: Product): string => OPT ? `${som(price(p))} · ${usd(optUsd(p))}` : som(price(p))
+/** Сумма списка товаров в долларах по оптовой цене. */
+export const usdSum = (items: { p: Product; qty: number }[], k = OPT_K): number =>
+  Math.round(items.reduce((s, r) => s + optUsd(r.p, k) * r.qty, 0) * 100) / 100

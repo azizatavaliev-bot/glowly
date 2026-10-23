@@ -1169,3 +1169,24 @@ button.m-buy { border: 0; width: 100%; font-family: inherit; }
 .price.two .rt { color: var(--mut); font-weight: 600; }
 .card .price.two .rt { font-size: 14px; }
 .price.big.two .rt { font-size: 22px; }
+
+/* доллары под оптовой ценой (23.10.2026) */
+.price.two .usd { font-size: .62em; font-weight: 700; color: var(--acc, #b5533c); margin-top: 3px; letter-spacing: .01em; }
+.price.big.two .usd { font-size: 18px; }
+
+/* ── Опт: сразу каталог, современный шрифт (23.10.2026) ── */
+.opt em, .opt h2 em, .opt h1 em { font-family: inherit; font-style: normal; font-weight: inherit; letter-spacing: inherit; }
+.opt-top { padding: 22px 0 6px; }
+.opt-top h1 { font-size: 30px; line-height: 1.15; font-weight: 800; letter-spacing: -.02em; margin: 0 0 12px; }
+.opt-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.opt-chips span { background: #fff; border: 1px solid var(--line, #ece6df); border-radius: 999px; padding: 8px 14px; font-size: 14px; color: var(--mut); }
+.opt-chips b { color: var(--ink, #15120f); font-weight: 700; }
+@media (max-width: 720px) {
+  .opt-top { padding: 14px 0 2px; }
+  .opt-top h1 { font-size: 22px; margin-bottom: 10px; }
+  .opt-chips span { font-size: 12.5px; padding: 7px 11px; }
+}
+/* шапка фиксированная — отступаем под неё; каталог прижимаем к условиям */
+.opt-top { padding-top: 92px; }
+.opt .catalog { padding-top: 8px; }
+@media (max-width: 720px) { .opt-top { padding-top: 78px; } }
