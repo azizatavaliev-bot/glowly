@@ -30,6 +30,13 @@ Vite 5 + React 18 + TypeScript, без бэкенда. Данные — стат
 - старый прод на GitHub Pages https://azizatavaliev-bot.github.io/glowly/ — больше не обновляется
 
 ## Деплой (Railway, с 01.10.2026)
+**С 23.10.2026 токен railway-token из Keychain не работает (Not Authorized).** Деплоить через CLI (вход по почте Азиза):
+```bash
+git worktree add --detach /tmp/lilo-deploy HEAD && cd /tmp/lilo-deploy
+for S in web opt; do railway up -p 4bdaa2dc-bd4d-4ca9-8d51-4d7c6e5cba20 -e d3e45f71-8d12-4386-b3ae-f2aaf3a382fb -s $S -d; done
+```
+Статус: `railway deployment list -p … -e … -s web`. Чистый worktree — чтобы не залить чужие черновики.
+
 Сервис собирается из GitHub-репо `azizatavaliev-bot/glowly` по Dockerfile (node build → nginx).
 **Автодеплой по push НЕ работает** (сервис создан через API, GitHub-триггер не подключён).
 `serviceInstanceDeployV2` пересобирает ТОТ ЖЕ старый коммит — бесполезно. Деплоить надо так:
