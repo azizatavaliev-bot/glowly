@@ -3,3 +3,7 @@ dist
 .git
 scripts
 *.md
+# студия /feed читает эти списки при сборке
+!scripts/cutout_report.json
+!scripts/photo_reject.json
+!scripts/content_reject.json
